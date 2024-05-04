@@ -63,6 +63,8 @@ vim.opt.scrolloff = 15
 
 -- VimTex configuration
 vim.g.vimtex_view_method = "zathura"
+vim.opt.spelllang = "en_us"
+vim.opt.spell = true
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
