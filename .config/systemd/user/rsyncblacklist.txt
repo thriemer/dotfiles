@@ -1,0 +1,130 @@
+# rsync --verbose --archive --delete --progress --exclude-from='/home/private/rsyncblacklist.txt' . /mnt/backup
+#These directories may be excluded:
+
+# contains mounted file systems
+.gvfs
+.local/share/gvfs-metadata
+# contains the actual encrypted home directory
+.Private
+# session-specific
+.dbus
+.cache
+.Trash
+.local/share/Trash
+# cached info about audio CDs
+.cddb
+
+#Flash-specific:
+
+# Cache for flash, maybe others?
+.adobe
+# except for Flash persistence, there is no reason to keep this
+.macromedia
+
+#Files:
+
+# contains errors from the current graphical session
+.bash_history*
+.xsession-errors
+# recently used files
+.recently-used
+.recently-used.xbel
+.thumbnails
+# session-specific
+.Xauthority
+.ICEauthority
+.gksu.lock
+.pulse  # directory
+.pulse-cookie
+.esd_auth
+
+#KDE specific:
+
+# Recent documents on KDE
+.kde/share/apps/RecentDocuments
+# Contains a history of the Klipper clipboard (KDE)
+.kde/share/apps/klipper
+# you will loose saved scrolling positions of PDFs
+.kde/share/apps/okular/docdata
+.kde/share/apps/gwenview/recentfolders
+# cached other users' profile pics
+.kde/share/apps/kmess/displaypics
+# cached emoticons of others
+.kde/share/apps/kmess/customemoticons
+
+#Firefox-specific (see also Profile folder):
+
+.mozilla/firefox/*/Cache
+# in case Fx crashes dumps will be stored in this
+.mozilla/firefox/*/minidumps
+# session-specific 
+.mozilla/firefox/*/.parentlock
+# phishing database, recreated
+.mozilla/firefox/*/urlclassifier3.sqlite
+# blacklisted extensions
+.mozilla/firefox/*/blocklist.xml
+# extension database, recreated on startup
+.mozilla/firefox/*/extensions.sqlite
+.mozilla/firefox/*/extensions.sqlite-journal
+.mozilla/firefox/*/extensions.rdf
+.mozilla/firefox/*/extensions.ini
+.mozilla/firefox/*/extensions.cache
+# cached UI data, recreated
+.mozilla/firefox/*/XUL.mfasl
+.mozilla/firefox/*/XPC.mfasl
+.mozilla/firefox/*/xpti.dat
+.mozilla/firefox/*/compreg.dat
+
+#GnuPG:
+
+.gnupg/rnd
+.gnupg/random_seed
+.gnupg/.#*
+.gnupg/*.lock
+.gnupg/gpg-agent-info-*
+
+#Google Chrome:
+
+.config/google-chrome/Default/Local Storage
+.config/google-chrome/Default/Session Storage
+.config/google-chrome/Default/Application Cache
+.config/google-chrome/Default/History Index *
+
+#Other apps:
+
+# Pidgin
+.pulse/icons
+# Cached applets
+.java/deployment/cache
+.icedteaplugin
+.icedtea
+.gnome2/epiphany/favicon_cache
+
+
+target/
+*target*/
+*build*/
+build/
+Cache/
+cache/
+*cache*/
+*Cache*/
+
+.m2
+.cargo
+.rustup
+.compose-cache
+.docker
+.kde
+.arduino*
+.npm
+.AndroidStudio
+.AndroidStudioBeta
+.gradle
+.gvm
+.yandex
+.kde
+.kde4
+.ivy2
+.sbt
+.local

@@ -1,0 +1,10 @@
+[Unit]
+Description=Backing up the home directory using rsync
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/run/current-system/sw/bin/rsync --verbose --archive --progress --exclude-from=%h'/.config/systemd/user/rsyncblacklist.txt' %h /mnt/backup
+
+[Install]
+WantedBy=default.target
