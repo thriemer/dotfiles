@@ -560,6 +560,7 @@ require("lazy").setup({
 			-- You can add other tools here that you want Mason to install
 			-- for you, so that they are available from within Neovim.
 			local ensure_installed = vim.tbl_keys(servers or {})
+			vim.list_extend(ensure_installed, { "stylua", "xmlformatter" })
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			require("mason-lspconfig").setup({
@@ -598,6 +599,7 @@ require("lazy").setup({
 				lua = { "stylua" },
 				tex = { "latexindent" },
 				nix = { "alejandra" },
+				xml = { "xmlformat" },
 			},
 			-- Set up format-on-save
 			format_on_save = { timeout_ms = 500, lsp_fallback = true },
