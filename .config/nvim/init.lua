@@ -142,8 +142,20 @@ require("lazy").setup({
 	{ "mfussenegger/nvim-dap" },
 	{ "nvim-neotest/nvim-nio" },
 	{
-		"rcarriga/nvim-dap-ui",
-		dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
+		"stevearc/oil.nvim",
+		---@module 'oil'
+		---@type oil.SetupOpts
+		opts = {},
+		-- Optional dependencies
+		dependencies = { { "echasnovski/mini.icons", opts = {} } },
+	},
+	{
+		"nvim-flutter/flutter-tools.nvim",
+		lazy = false,
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"stevearc/dressing.nvim", -- optional for vim.ui.select
+		},
 		config = function()
 			require("dapui").setup()
 
@@ -164,6 +176,11 @@ require("lazy").setup({
 			vim.keymap.set("n", "<Leader>do", ":DapStepOver<CR>", { desc = "Step over" })
 		end,
 	},
+	{
+		"sphamba/smear-cursor.nvim",
+		opts = {},
+	},
+	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	{
 		"lervag/vimtex",
 		lazy = false, -- we don't want to lazy load VimTeX
@@ -232,12 +249,7 @@ require("lazy").setup({
 	-- "gc" to comment visual regions/lines
 	{ "numToStr/Comment.nvim", opts = {} },
 
-	-- Here is a more advanced example where we pass configuration
-	-- options to `gitsigns.nvim`. This is equivalent to the following lua:
-	--    require('gitsigns').setup({ ... })
-	--
-	-- See `:help gitsigns` to understand what the configuration keys do
-	{ -- Adds git related signs to the gutter, as well as utilities for managing changes
+	{
 		"lewis6991/gitsigns.nvim",
 		opts = {
 			signs = {
@@ -520,19 +532,14 @@ require("lazy").setup({
 			--  - settings (table): Override the default settings passed when initializing the server.
 			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 			local servers = {
-				-- clangd = {},
-				-- gopls = {},
-				-- pyright = {},
-				-- rust_analyzer = {},
-				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-				--
-				-- Some languages (like typescript) have entire language plugins that can be useful:
-				--    https://github.com/pmizio/typescript-tools.nvim
-				--
-				-- But for many setups, the LSP (`tsserver`) will work just fine
-				-- tsserver = {},
-				--
-
+				pylsp = {},
+				rust_analyzer = {},
+				ltex = {
+					language = "de",
+					additionalRules = {
+						languageModel = "~/.ngram/",
+					},
+				},
 				lua_ls = {
 					-- cmd = {...},
 					-- filetypes { ...},
@@ -598,6 +605,9 @@ require("lazy").setup({
 			formatters_by_ft = {
 				lua = { "stylua" },
 				tex = { "latexindent" },
+				javascript = { "prettier" },
+				css = { "prettier" },
+				markdown = { "prettier" },
 				nix = { "alejandra" },
 				xml = { "xmlformat" },
 			},
@@ -778,7 +788,7 @@ require("lazy").setup({
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		opts = {
-			ensure_installed = { "bash", "c", "html", "lua", "markdown", "vim", "vimdoc" },
+			ensure_installed = { "bash", "c", "html", "lua", "markdown", "vim", "vimdoc", "python" },
 			-- Autoinstall languages that are not installed
 			auto_install = true,
 			ignore_install = { "latex" },
@@ -806,25 +816,8 @@ require("lazy").setup({
 			--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 		end,
 	},
-
-	-- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
-	-- init.lua. If you want these files, they are in the repository, so you can just download them and
-	-- put them in the right spots if you want.
-
-	-- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for kickstart
-	--
-	--  Here are some example plugins that I've included in the kickstart repository.
-	--  Uncomment any of the lines below to enable them (you will need to restart nvim).
-	--
-	-- require 'kickstart.plugins.debug',
-	-- require 'kickstart.plugins.indent_line',
-
-	-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-	--    This is the easiest way to modularize your config.
-	--
-	--  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-	--    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-	-- { import = 'custom.plugins' },
+	require("kickstart.plugins.debug"),
+	{ import = "custom.plugins" },
 }, {
 	ui = {
 		-- If you have a Nerd Font, set icons to an empty table which will use the
