@@ -1,0 +1,6 @@
+[selection]
+save_to_clipboard = true
+
+[terminal]
+shell ="/usr/bin/fish"
+
