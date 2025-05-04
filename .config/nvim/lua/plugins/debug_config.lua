@@ -1,6 +1,5 @@
 return {
 	"mfussenegger/nvim-dap",
-	{ "rcarriga/nvim-dap-ui", opts = {}, dependencies = { "nvim-neotest/nvim-nio" } },
 	dependencies = {
 		-- Creates a beautiful debugger UI
 		"rcarriga/nvim-dap-ui",
@@ -16,6 +15,7 @@ return {
 		"leoluz/nvim-dap-go",
 	},
 	keys = {
+		-- Basic debugging keymaps, feel free to change to your liking!
 		{
 			"<F5>",
 			function()
@@ -58,6 +58,7 @@ return {
 			end,
 			desc = "Debug: Set Breakpoint",
 		},
+		-- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
 		{
 			"<F7>",
 			function()
