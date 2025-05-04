@@ -2,6 +2,7 @@ return {
 	"neovim/nvim-lspconfig",
 	dependencies = {
 		{ "williamboman/mason.nvim", opts = {} },
+		"nvim-java/nvim-java",
 		"williamboman/mason-lspconfig.nvim",
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
 		{ "j-hui/fidget.nvim", opts = {} },
@@ -180,6 +181,7 @@ return {
 					},
 				},
 			},
+			jdtls = {},
 		}
 		local ensure_installed = vim.tbl_keys(servers or {})
 		vim.list_extend(ensure_installed, {
@@ -198,6 +200,15 @@ return {
 					-- certain features of an LSP (for example, turning off formatting for ts_ls)
 					server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
 					require("lspconfig")[server_name].setup(server)
+				end,
+				jdtls = function()
+					require("java").setup({
+						-- Your custom jdtls settings goes here
+					})
+
+					require("lspconfig").jdtls.setup({
+						-- Your custom nvim-java configuration goes here
+					})
 				end,
 			},
 		})
