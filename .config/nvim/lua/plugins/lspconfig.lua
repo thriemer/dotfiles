@@ -204,6 +204,17 @@ return {
 				jdtls = function()
 					require("java").setup({
 						-- Your custom jdtls settings goes here
+						root_markers = {
+							".git",
+							"settings.gradle",
+							"settings.gradle.kts",
+							"pom.xml",
+							"build.gradle",
+							"mvnw",
+							"gradlew",
+							"build.gradle",
+							"build.gradle.kts",
+						},
 					})
 
 					require("lspconfig").jdtls.setup({
