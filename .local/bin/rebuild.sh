@@ -8,8 +8,8 @@
 set -e
 
 # cd to your config dir
-pushd ~/.NixOS/
-
+pushd ~/.dotfiles/NixOs/
+echo $(pwd)
 if [ -n "$1" ]; then
   echo "Merging into master"
   git checkout dev
@@ -30,14 +30,14 @@ if [ -n "$1" ]; then
 fi
 
 git checkout dev
-git pull
+git pull || true # ignore when the pull doesnt work due to local changes
 
 # Edit your config
-$EDITOR configuration.nix
+$EDITOR ~/.dotfiles/NixOs/configuration.nix
 
 
 # Early return if no changes were detected (thanks @singiamtel!)
-if git diff --quiet '*.nix'; then
+if git diff --quiet ; then
     echo "No changes detected, exiting."
     popd
     exit 0
@@ -48,7 +48,7 @@ alejandra . &>/dev/null \
   || ( alejandra . ; echo "formatting failed!" && exit 1)
 
 # Shows your changes
-git diff -U0 '*.nix'
+git diff -U0
 
 config_file=$(pwd)/configuration.nix
 echo "NixOS Rebuilding... using file: $config_file"

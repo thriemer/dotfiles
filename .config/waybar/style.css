@@ -7,7 +7,7 @@
 }
 
 #waybar {
-  background: transparent;
+  background: rgba(1,1,1,0.5);
   color: @text;
   margin: 5px 5px;
 }
@@ -15,7 +15,6 @@
 #workspaces {
   border-radius: 1rem;
   margin: 5px;
-  background-color: @surface0;
   margin-left: 1rem;
 }
 
@@ -36,14 +35,17 @@
 }
 
 #custom-music,
-#tray,
 #backlight,
 #clock,
 #battery,
 #pulseaudio,
 #custom-lock,
 #custom-power {
-  background-color: @surface0;
+  padding: 0.5rem 1rem;
+  margin: 5px 0;
+}
+
+#tray{
   padding: 0.5rem 1rem;
   margin: 5px 0;
 }

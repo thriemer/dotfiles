@@ -46,7 +46,7 @@
       modesetting.enable = true;
       open = true;
       nvidiaSettings = true;
-      powerManagement.enable = true;
+      powerManagement.enable = false;
       prime = {
         sync.enable = true; #offload gpu heavy tasks to nvidia, the dedicated gpu is never really sleeping
         nvidiaBusId = "PCI:1:0:0";
@@ -58,20 +58,14 @@
   };
 
   services = {
-    desktopManager.plasma6.enable = true;
-
     displayManager = {
-      defaultSession = "none+i3";
+      defaultSession = "hyprland-uwsm";
       sddm.enable = true;
     };
 
-    # Configure X11
+    # Configure graphics
     xserver = {
       enable = true;
-      windowManager.i3 = {
-        enable = true;
-        extraPackages = with pkgs; [rofi i3status i3lock];
-      };
       videoDrivers = ["displaylink" "modesetting" "nvidia"];
       xkb = {
         layout = "de";
@@ -81,6 +75,7 @@
     printing.enable = true;
     gvfs.enable = true;
     udisks2.enable = true;
+    blueman.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;
@@ -146,9 +141,12 @@
     dates = "daily";
     options = "--delete-older-than 15d";
   };
-  system.autoUpgrade = {
-    enable = true;
-    dates = "06:00";
+  system = {
+    copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
+    autoUpgrade = {
+      enable = true;
+      dates = "06:00";
+    };
   };
 
   # List packages installed in system profile. To search, run:
@@ -218,10 +216,7 @@
       enable = true;
       defaultEditor = true;
     };
-    gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
-    };
+    ssh.startAgent = true; #remeber private keys so that i dont have to type them in again
   };
 
   # Open ports in the firewall.
