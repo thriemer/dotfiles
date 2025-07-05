@@ -15,10 +15,12 @@
   networking.hostName = "linus-x1"; # Define your hostname.
 
   # Enable networking
-  networking.networkmanager.enable = true;
-  networking.wireless.iwd.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
-
+  networking = {
+    networkmanager.enable = true;
+    wireless.iwd.enable = true;
+    networkmanager.wifi.backend = "iwd";
+    wireguard.enable = true;
+  };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
