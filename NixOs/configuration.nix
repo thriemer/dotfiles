@@ -120,6 +120,7 @@
         lens
         zoom-us
         graphviz
+        databricks-cli
       ];
     };
 
@@ -131,7 +132,7 @@
       extraGroups = ["wheel" "networkmanager" "netdev"];
       packages = with pkgs; [
         zathura
-        # dbeaver-bin
+        dbeaver-bin
         # inkscape
         # visualvm
       ];
@@ -185,8 +186,8 @@
     #  rustup
     gcc
     git
-    #    jetbrains.idea-ultimate
-    #    jetbrains.rust-rover
+    jetbrains.idea-ultimate
+    jetbrains.rust-rover
     unzip
     gzip
     wget
@@ -196,9 +197,9 @@
     alejandra # formatting nix files
     libnotify
     stow
-    # sysstat
     tmux
     lazygit
+
     # Vim
     vscodium
     tree-sitter
