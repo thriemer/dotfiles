@@ -159,7 +159,6 @@
   };
 
   # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
     displaylink
     firefox
@@ -181,9 +180,6 @@
     pavucontrol
 
     # Development
-    # (python310.withPackages (ps: with ps; [pandas matplotlib]))
-    # cargo
-    #  rustup
     pyenv
     gcc
     git
