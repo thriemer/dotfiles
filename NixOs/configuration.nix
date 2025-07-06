@@ -119,7 +119,6 @@
         slack
         kubectl
         kubelogin
-        lens
         zoom-us
         graphviz
         databricks-cli
