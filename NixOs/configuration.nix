@@ -121,6 +121,7 @@
         zoom-us
         graphviz
         databricks-cli
+        poetry
       ];
     };
 
