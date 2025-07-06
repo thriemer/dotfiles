@@ -166,6 +166,7 @@
     insomnia
     openconnect
     alacritty
+    kdePackages.dolphin
 
     # hyprland
     wofi
