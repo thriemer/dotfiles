@@ -77,6 +77,7 @@
       };
     };
     printing.enable = true;
+    envfs.enable = true; # enable bash for scripts that assume hard coded shebang
     gvfs.enable = true;
     udisks2.enable = true;
     blueman.enable = true;
