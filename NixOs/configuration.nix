@@ -121,8 +121,8 @@
         zoom-us
         graphviz
         databricks-cli
-        poetry
         awscli2
+        (pkgs.callPackage /home/work/mercedes/idp/idpcli.nix {})
       ];
     };
 
