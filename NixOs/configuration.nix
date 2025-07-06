@@ -122,6 +122,7 @@
         graphviz
         databricks-cli
         poetry
+        awscli2
       ];
     };
 
@@ -166,9 +167,7 @@
     keepassxc
     ffmpeg
     gimp
-    insomnia
     openconnect
-    alacritty
     kdePackages.dolphin
 
     # hyprland
