@@ -21,7 +21,7 @@
     wireless.iwd.enable = true;
     networkmanager.wifi.backend = "iwd";
     wireguard.enable = true;
-    firewall.allowedUDPPorts = [51820];
+    firewall.checkReversePath = false; #so that the wireguard vpn works
   };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
