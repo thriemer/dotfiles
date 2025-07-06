@@ -185,6 +185,7 @@
     # (python310.withPackages (ps: with ps; [pandas matplotlib]))
     # cargo
     #  rustup
+    pyenv
     gcc
     git
     jetbrains.idea-ultimate
