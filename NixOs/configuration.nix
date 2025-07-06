@@ -106,32 +106,35 @@
 
   security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.work = {
-    isNormalUser = true;
-    description = "Linus";
-    extraGroups = ["networkmanager" "wheel" "netdev"];
-    packages = with pkgs; [
-      slack
-      kubectl
-      kubelogin
-      lens
-      zoom-us
-      graphviz
-    ];
-  };
+  users = {
+    mutableUsers = true;
+    users.work = {
+      isNormalUser = true;
+      description = "Linus";
+      extraGroups = ["networkmanager" "wheel" "netdev"];
+      packages = with pkgs; [
+        slack
+        kubectl
+        kubelogin
+        lens
+        zoom-us
+        graphviz
+      ];
+    };
 
-  users.users.private = {
-    uid = 1030;
-    isNormalUser = true;
-    home = "/home/private";
-    description = "Private Linus";
-    extraGroups = ["wheel" "networkmanager" "netdev"];
-    packages = with pkgs; [
-      zathura
-      # dbeaver-bin
-      # inkscape
-      # visualvm
-    ];
+    users.private = {
+      uid = 1030;
+      isNormalUser = true;
+      home = "/home/private";
+      description = "Private Linus";
+      extraGroups = ["wheel" "networkmanager" "netdev"];
+      packages = with pkgs; [
+        zathura
+        # dbeaver-bin
+        # inkscape
+        # visualvm
+      ];
+    };
   };
 
   # Allow unfree packages
