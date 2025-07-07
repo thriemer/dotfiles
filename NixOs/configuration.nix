@@ -180,6 +180,7 @@
     dunst
     hyprpaper
     hyprlock
+    hypridle
     playerctl
     pavucontrol
 
