@@ -123,7 +123,7 @@
         graphviz
         databricks-cli
         awscli
-        (pkgs.callPackage /home/work/mercedes/idp/idpcli.nix {})
+        (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
       ];
     };
 
