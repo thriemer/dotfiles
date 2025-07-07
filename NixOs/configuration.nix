@@ -185,11 +185,13 @@
     pavucontrol
 
     # Development
-    pyenv
     gcc
     git
+    python311
+    poetry
     jetbrains.idea-ultimate
     jetbrains.rust-rover
+    jetbrains.pycharm-professional
     unzip
     gzip
     wget
