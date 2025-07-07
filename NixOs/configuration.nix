@@ -122,6 +122,8 @@
         zoom-us
         graphviz
         databricks-cli
+        python311
+        poetry
         awscli
         (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
         (pkgs.callPackage /home/work/software/insomnium.nix {})
@@ -187,8 +189,6 @@
     # Development
     gcc
     git
-    python311
-    poetry
     jetbrains.idea-ultimate
     jetbrains.rust-rover
     jetbrains.pycharm-professional
