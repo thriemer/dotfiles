@@ -18,8 +18,6 @@
   # Enable networking
   networking = {
     networkmanager.enable = true;
-    wireless.iwd.enable = true;
-    networkmanager.wifi.backend = "iwd";
     wireguard.enable = true;
     firewall.checkReversePath = false; #so that the wireguard vpn works
   };
