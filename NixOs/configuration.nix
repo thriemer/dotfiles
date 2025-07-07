@@ -181,6 +181,7 @@
     hypridle
     playerctl
     pavucontrol
+    wlogout
 
     # Development
     gcc
