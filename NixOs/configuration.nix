@@ -179,6 +179,7 @@
     networkmanagerapplet
     dunst
     hyprpaper
+    hyprlock
     playerctl
     pavucontrol
 
