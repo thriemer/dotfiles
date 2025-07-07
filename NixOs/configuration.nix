@@ -124,6 +124,8 @@
         databricks-cli
         awscli
         (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
+        (pkgs.callPackage /home/work/software/insomnium.nix {})
+        (pkgs.callPackage /home/work/software/freelens.nix {})
       ];
     };
 
