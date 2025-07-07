@@ -223,6 +223,10 @@
       defaultEditor = true;
     };
     ssh.startAgent = true; #remeber private keys so that i dont have to type them in again
+    appimage = {
+      enable = true;
+      binfmt = true;
+    };
   };
 
   # This value determines the NixOS release from which the default
