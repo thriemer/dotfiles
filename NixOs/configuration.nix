@@ -2,10 +2,17 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  nixvim = import (builtins.fetchGit {
+    url = "https://github.com/nix-community/nixvim";
+    # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
+    # ref = "nixos-25.05";
+  });
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    nixvim.nixosModules.nixvim
   ];
   nix.settings.experimental-features = ["nix-command" "flakes"];
   # Bootloader.
@@ -221,8 +228,10 @@
       xwayland.enable = true;
     };
     fish.enable = true;
-    neovim = {
+    nixvim = {
       enable = true;
+      colorschemes.catppuccin.enable = true;
+      plugins.lualine.enable = true;
       defaultEditor = true;
     };
     ssh.startAgent = true; #remeber private keys so that i dont have to type them in again
