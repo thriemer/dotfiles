@@ -3,22 +3,37 @@
   pkgs,
   ...
 }: let
-  nixvim = import (builtins.fetchGit {
-    url = "https://github.com/nix-community/nixvim";
-    # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
-    # ref = "nixos-25.05";
-  });
+  nixvim = import (
+    builtins.fetchGit {
+      url = "https://github.com/nix-community/nixvim";
+      # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
+      # ref = "nixos-25.05";
+    }
+  );
 in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     nixvim.nixosModules.nixvim
   ];
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = ["ntfs"];
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    supportedFilesystems = ["ntfs"];
+    initrd.kernelModules = [
+      "nvidia"
+      "evdi"
+    ];
+    extraModulePackages = [
+      config.boot.kernelPackages.nvidia_x11
+      config.boot.kernelPackages.evdi
+    ];
+  };
 
   networking.hostName = "linus-x1"; # Define your hostname.
 
@@ -26,7 +41,7 @@ in {
   networking = {
     networkmanager.enable = true;
     wireguard.enable = true;
-    firewall.checkReversePath = false; #so that the wireguard vpn works
+    firewall.checkReversePath = false; # so that the wireguard vpn works
   };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
@@ -57,7 +72,7 @@ in {
       nvidiaSettings = true;
       powerManagement.enable = true;
       prime = {
-        sync.enable = true; #offload gpu heavy tasks to nvidia, the dedicated gpu is never really sleeping
+        sync.enable = true; # offload gpu heavy tasks to nvidia, the dedicated gpu is never really sleeping
         nvidiaBusId = "PCI:1:0:0";
         intelBusId = "PCI:0:2:0";
       };
@@ -75,7 +90,11 @@ in {
     # Configure graphics
     xserver = {
       enable = true;
-      videoDrivers = ["displaylink" "modesetting" "nvidia"];
+      videoDrivers = [
+        "displaylink"
+        "modesetting"
+        "nvidia"
+      ];
       xkb = {
         layout = "de";
         variant = "";
@@ -106,12 +125,6 @@ in {
     setSocketVariable = true;
   };
 
-  # Enable CUPS to print documents.
-  boot.initrd.kernelModules = ["nvidia" "evdi"];
-  boot.extraModulePackages = [config.boot.kernelPackages.nvidia_x11 config.boot.kernelPackages.evdi];
-
-  # Enable sound with pipewire.
-
   security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
@@ -119,7 +132,11 @@ in {
     users.work = {
       isNormalUser = true;
       description = "Linus";
-      extraGroups = ["networkmanager" "wheel" "netdev"];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "netdev"
+      ];
       packages = with pkgs; [
         slack
         kubectl
@@ -139,7 +156,11 @@ in {
       isNormalUser = true;
       home = "/home/private";
       description = "Private Linus";
-      extraGroups = ["wheel" "networkmanager" "netdev"];
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "netdev"
+      ];
       packages = with pkgs; [
         zathura
         dbeaver-bin
@@ -232,6 +253,92 @@ in {
 
     nixvim = {
       enable = true;
+
+      globalOpts = {
+        # Line numbers
+        number = true;
+        relativenumber = true;
+
+        # Enable more colors (24-bit)
+        termguicolors = true;
+
+        # Have a better completion experience
+        completeopt = [
+          "menuone"
+          "noselect"
+          "noinsert"
+        ];
+
+        # Always show the signcolumn, otherwise text would be shifted when displaying error icons
+        signcolumn = "yes";
+
+        # Enable mouse
+        mouse = "a";
+
+        # Search
+        ignorecase = true;
+        smartcase = true;
+
+        # Configure how new splits should be opened
+        splitright = true;
+        splitbelow = true;
+
+        list = true;
+        # NOTE: .__raw here means that this field is raw lua code
+        listchars.__raw = "{ tab = '» ', trail = '·', nbsp = '␣' }";
+
+        expandtab = true;
+        # tabstop = 4;
+        shiftwidth = 2;
+        # softtabstop = 0;
+        # smarttab = true;
+
+        # System clipboard support, needs xclip/wl-clipboard
+        clipboard = {
+          providers.wl-copy.enable = true; # Use wl-copy for wayland and xsel for Xorg
+          register = "unnamedplus";
+        };
+
+        # Set encoding
+        encoding = "utf-8";
+        fileencoding = "utf-8";
+
+        # Save undo history
+        undofile = true;
+        swapfile = true;
+        backup = false;
+        autoread = true;
+
+        # Highlight the current line for cursor
+        cursorline = true;
+
+        # Show line and column when searching
+        ruler = true;
+
+        # Global substitution by default
+        gdefault = true;
+
+        # Start scrolling when the cursor is X lines away from the top/bottom
+        scrolloff = 5;
+      };
+
+      diagnostics = {
+        update_in_insert = true;
+        severity_sort = true;
+        float = {
+          border = "rounded";
+        };
+        jump = {
+          severity.__raw = "vim.diagnostic.severity.WARN";
+        };
+      };
+      globals.mapleader = " ";
+      highlight = {
+        Comment.fg = "#ff00ff";
+        Comment.bg = "#000000";
+        Comment.underline = true;
+        Comment.bold = true;
+      };
 
       plugins = {
         oil.enable = true;
@@ -339,7 +446,10 @@ in {
             dap-ui = {
               enable = true;
               floating.mappings = {
-                close = ["<ESC>" "q"];
+                close = [
+                  "<ESC>"
+                  "q"
+                ];
               };
             };
             dap-virtual-text = {
@@ -394,32 +504,6 @@ in {
         {
           action = "<cmd>Neotree toggle<CR>";
           key = "<leader>e";
-        }
-
-        # Undotree
-        {
-          mode = "n";
-          key = "<leader>ut";
-          action = "<cmd>UndotreeToggle<CR>";
-          options = {
-            desc = "Undotree";
-          };
-        }
-
-        # Lazygit
-        {
-          mode = "n";
-          key = "<leader>gg";
-          action = "<cmd>LazyGit<CR>";
-          options = {
-            desc = "LazyGit (root dir)";
-          };
-        }
-
-        # Commentary bindings
-        {
-          action = "<cmd>Commentary<CR>";
-          key = "<leader>/";
         }
 
         # Telescope bindings
@@ -509,12 +593,11 @@ in {
           };
         }
       ];
-      clipboard.providers.wl-copy.enable = true;
       colorschemes.catppuccin.enable = true;
       plugins.lualine.enable = true;
       defaultEditor = true;
     };
-    ssh.startAgent = true; #remeber private keys so that i dont have to type them in again
+    ssh.startAgent = true; # remeber private keys so that i dont have to type them in again
     appimage = {
       enable = true;
       binfmt = true;
