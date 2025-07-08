@@ -580,7 +580,7 @@ in {
         {
           mode = "n";
           key = "<S-h>";
-          action = "<cmd>lua vim.diagnostic.open_float<cr>";
+          action = "<cmd>lua vim.diagnostic.open_float()<cr>";
 
           options = {
             desc = "Open diagonstics";
