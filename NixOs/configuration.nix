@@ -344,7 +344,7 @@ in {
         oil.enable = true;
 
         which-key = {
-          enable = false;
+          enable = true;
           registrations = {
             "<leader>fg" = "Find Git files with telescope";
             "<leader>fw" = "Find text with telescope";
