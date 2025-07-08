@@ -2,7 +2,7 @@
     "label" : "shutdown",
     "action" : "systemctl poweroff",
     "text" : "Shutdown",
-    "keybind" : "s"
+    "keybind" : "S"
 }
 {
     "label" : "logout",
@@ -11,10 +11,10 @@
     "keybind" : "e"
 }
 {
-    "label" : "hibernate",
-    "action" : "swaylock -f && systemctl hibernate",
-    "text" : "Hibernate",
-    "keybind" : "h"
+    "label" : "suspend",
+    "action" : "hyprlock -f ; systemctl suspend",
+    "text" : "Suspend",
+    "keybind" : "s"
 }
 {
     "label" : "lock",
