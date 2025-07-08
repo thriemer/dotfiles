@@ -50,10 +50,7 @@
       nvidiaSettings = true;
       powerManagement.enable = true;
       prime = {
-        offload = {
-          enable = true;
-          enableOffloadCmd = true;
-        };
+        sync.enable = true; #offload gpu heavy tasks to nvidia, the dedicated gpu is never really sleeping
         nvidiaBusId = "PCI:1:0:0";
         intelBusId = "PCI:0:2:0";
       };
