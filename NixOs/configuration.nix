@@ -232,7 +232,30 @@ in {
     nixvim = {
       enable = true;
 
-      clipboard.register = "copyq";
+      plugins = {
+        oil.enable = true;
+        telescope = {
+          enable = true;
+        };
+        lsp-format.enable = true;
+        lsp = {
+          enable = true;
+          inlayHints = true;
+          servers = {
+            rust_analyzer = {
+              enable = true;
+              installRustc = true;
+              installCargo = true;
+            };
+            pyright.enable = true; # Python
+            nil_ls.enable = true; # Nix
+            dockerls.enable = true; # Docker
+            bashls.enable = true; # Bash
+          };
+        };
+      };
+
+      clipboard.providers.wl-copy.enable = true;
       colorschemes.catppuccin.enable = true;
       plugins.lualine.enable = true;
       defaultEditor = true;
