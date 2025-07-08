@@ -16,10 +16,19 @@ in {
     ./hardware-configuration.nix
     nixvim.nixosModules.nixvim
   ];
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  nix = {
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    optimise.automatic = true;
+    gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 15d";
+    };
+  };
+
   # Bootloader.
   boot = {
     loader.systemd-boot.enable = true;
@@ -173,12 +182,6 @@ in {
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  nix.optimise.automatic = true;
-  nix.gc = {
-    automatic = true;
-    dates = "daily";
-    options = "--delete-older-than 15d";
-  };
   system = {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
     autoUpgrade = {
@@ -402,7 +405,6 @@ in {
               alejandra.enable = true;
               stylua.enable = true;
               shfmt.enable = true;
-              nixpkgs_fmt.enable = true;
               google_java_format.enable = false;
               prettier = {
                 enable = true;
@@ -578,9 +580,9 @@ in {
         {
           mode = "n";
           key = "<S-h>";
-          action = "<cmd>BufferLineCyclePrev<cr>";
+          action = "vim.diagnostic.open_float";
           options = {
-            desc = "Cycle to previous buffer";
+            desc = "Open diagonstics";
           };
         }
 
