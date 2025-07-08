@@ -229,13 +229,148 @@ in {
       xwayland.enable = true;
     };
     fish.enable = true;
+
     nixvim = {
       enable = true;
 
       plugins = {
         oil.enable = true;
+
+        which-key = {
+          enable = false;
+          registrations = {
+            "<leader>fg" = "Find Git files with telescope";
+            "<leader>fw" = "Find text with telescope";
+            "<leader>ff" = "Find files with telescope";
+          };
+        };
+
+        render-markdown = {
+          enable = true;
+        };
+
+        image = {
+          enable = true;
+          backend = "kitty";
+          hijackFilePatterns = [
+            "*.png"
+            "*.jpg"
+            "*.jpeg"
+            "*.gif"
+            "*.webp"
+          ];
+          maxHeightWindowPercentage = 25;
+          tmuxShowOnlyInActiveWindow = true;
+          settings = {
+            markdown = {
+              enabled = true;
+              downloadRemoteImages = true;
+              filetypes = [
+                "markdown"
+                "vimwiki"
+                "mdx"
+              ];
+            };
+          };
+        };
+
+        none-ls = {
+          enable = true;
+          settings = {
+            cmd = ["bash -c nvim"];
+            debug = true;
+          };
+          sources = {
+            code_actions = {
+              statix.enable = true;
+              gitsigns.enable = true;
+            };
+            diagnostics = {
+              statix.enable = true;
+              deadnix.enable = true;
+              pylint.enable = true;
+              checkstyle.enable = true;
+            };
+            formatting = {
+              alejandra.enable = true;
+              stylua.enable = true;
+              shfmt.enable = true;
+              nixpkgs_fmt.enable = true;
+              google_java_format.enable = false;
+              prettier = {
+                enable = true;
+                disableTsServerFormatter = true;
+              };
+              black = {
+                enable = true;
+                settings = ''
+                  {
+                    extra_args = { "--fast" },
+                  }
+                '';
+              };
+            };
+            completion = {
+              luasnip.enable = true;
+              spell.enable = true;
+            };
+          };
+        };
+        dap = {
+          enable = true;
+          signs = {
+            dapBreakpoint = {
+              text = "●";
+              texthl = "DapBreakpoint";
+            };
+            dapBreakpointCondition = {
+              text = "●";
+              texthl = "DapBreakpointCondition";
+            };
+            dapLogPoint = {
+              text = "◆";
+              texthl = "DapLogPoint";
+            };
+          };
+          extensions = {
+            dap-python = {
+              enable = true;
+            };
+            dap-ui = {
+              enable = true;
+              floating.mappings = {
+                close = ["<ESC>" "q"];
+              };
+            };
+            dap-virtual-text = {
+              enable = true;
+            };
+          };
+          configurations = {
+            java = [
+              {
+                type = "java";
+                request = "launch";
+                name = "Debug (Attach) - Remote";
+                hostName = "127.0.0.1";
+                port = 5005;
+              }
+            ];
+          };
+        };
+
+        # Git signs in code
+        gitsigns = {
+          enable = true;
+          settings.current_line_blame = true;
+        };
         telescope = {
           enable = true;
+          extensions = {
+            fzf-native = {
+              enable = true;
+            };
+          };
         };
         lsp-format.enable = true;
         lsp = {
@@ -254,7 +389,126 @@ in {
           };
         };
       };
+      keymaps = [
+        # Neo-tree bindings
+        {
+          action = "<cmd>Neotree toggle<CR>";
+          key = "<leader>e";
+        }
 
+        # Undotree
+        {
+          mode = "n";
+          key = "<leader>ut";
+          action = "<cmd>UndotreeToggle<CR>";
+          options = {
+            desc = "Undotree";
+          };
+        }
+
+        # Lazygit
+        {
+          mode = "n";
+          key = "<leader>gg";
+          action = "<cmd>LazyGit<CR>";
+          options = {
+            desc = "LazyGit (root dir)";
+          };
+        }
+
+        # Commentary bindings
+        {
+          action = "<cmd>Commentary<CR>";
+          key = "<leader>/";
+        }
+
+        # Telescope bindings
+
+        {
+          action = "<cmd>Telescope live_grep<CR>";
+          key = "<leader>fw";
+        }
+        {
+          action = "<cmd>Telescope find_files<CR>";
+          key = "<leader>ff";
+        }
+        {
+          action = "<cmd>Telescope git_commits<CR>";
+          key = "<leader>fg";
+        }
+        {
+          action = "<cmd>Telescope oldfiles<CR>";
+          key = "<leader>fh";
+        }
+        {
+          action = "<cmd>Telescope colorscheme<CR>";
+          key = "<leader>ch";
+        }
+        {
+          action = "<cmd>Telescope man_pages<CR>";
+          key = "<leader>fm";
+        }
+
+        # Notify bindings
+
+        {
+          mode = "n";
+          key = "<leader>un";
+          action = ''
+            <cmd>lua require("notify").dismiss({ silent = true, pending = true })<cr>
+          '';
+          options = {
+            desc = "Dismiss All Notifications";
+          };
+        }
+
+        # Bufferline bindings
+
+        {
+          mode = "n";
+          key = "<Tab>";
+          action = "<cmd>BufferLineCycleNext<cr>";
+          options = {
+            desc = "Cycle to next buffer";
+          };
+        }
+
+        {
+          mode = "n";
+          key = "<S-Tab>";
+          action = "<cmd>BufferLineCyclePrev<cr>";
+          options = {
+            desc = "Cycle to previous buffer";
+          };
+        }
+
+        {
+          mode = "n";
+          key = "<S-l>";
+          action = "<cmd>BufferLineCycleNext<cr>";
+          options = {
+            desc = "Cycle to next buffer";
+          };
+        }
+
+        {
+          mode = "n";
+          key = "<S-h>";
+          action = "<cmd>BufferLineCyclePrev<cr>";
+          options = {
+            desc = "Cycle to previous buffer";
+          };
+        }
+
+        {
+          mode = "n";
+          key = "<leader>bd";
+          action = "<cmd>bdelete<cr>";
+          options = {
+            desc = "Delete buffer";
+          };
+        }
+      ];
       clipboard.providers.wl-copy.enable = true;
       colorschemes.catppuccin.enable = true;
       plugins.lualine.enable = true;
