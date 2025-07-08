@@ -189,6 +189,7 @@ in {
     playerctl
     pavucontrol
     wlogout
+    copyq
 
     # Development
     gcc
@@ -230,6 +231,8 @@ in {
     fish.enable = true;
     nixvim = {
       enable = true;
+
+      clipboard.register = "copyq";
       colorschemes.catppuccin.enable = true;
       plugins.lualine.enable = true;
       defaultEditor = true;
