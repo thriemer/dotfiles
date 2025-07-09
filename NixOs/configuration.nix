@@ -256,7 +256,7 @@ in {
 
     nixvim = {
       enable = true;
-      globals.mapLeader = " ";
+      globals.mapleader = " ";
       opts = {
         # Line numbers
         number = true;
@@ -521,9 +521,8 @@ in {
         }
       ];
       keymaps = [
-        # Neo-tree bindings
         {
-          action = "<cmd>Oil<CR>";
+          action = ":Oil<CR>";
           key = "<leader>e";
         }
 
@@ -541,6 +540,11 @@ in {
         {
           action = "<cmd>Telescope man_pages<CR>";
           key = "<leader>sm";
+        }
+        {
+          action = "<cmd>Telescope quickfix<CR>";
+          key = "<leader> sq";
+          options.desc = "Search Quickfix";
         }
         # Bufferline bindings
 
