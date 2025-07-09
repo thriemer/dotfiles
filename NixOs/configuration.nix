@@ -296,12 +296,6 @@ in {
         # softtabstop = 0;
         # smarttab = true;
 
-        # System clipboard support, needs xclip/wl-clipboard
-        clipboard = {
-          providers.wl-copy.enable = true; # Use wl-copy for wayland and xsel for Xorg
-          register = "unnamedplus";
-        };
-
         # Set encoding
         encoding = "utf-8";
         fileencoding = "utf-8";
@@ -323,6 +317,18 @@ in {
 
         # Start scrolling when the cursor is X lines away from the top/bottom
         scrolloff = 5;
+      };
+      # System clipboard support, needs xclip/wl-clipboard
+      clipboard = {
+        # Use system clipboard
+        register = "unnamedplus";
+
+        providers = {
+          wl-copy = {
+            enable = true;
+            package = pkgs.copyq;
+          };
+        };
       };
 
       diagnostics = {
