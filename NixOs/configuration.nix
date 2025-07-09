@@ -256,8 +256,8 @@ in {
 
     nixvim = {
       enable = true;
-
-      globalOpts = {
+      globals.mapLeader = " ";
+      opts = {
         # Line numbers
         number = true;
         relativenumber = true;
@@ -322,13 +322,7 @@ in {
       clipboard = {
         # Use system clipboard
         register = "unnamedplus";
-
-        providers = {
-          wl-copy = {
-            enable = true;
-            package = pkgs.copyq;
-          };
-        };
+        providers.wl-copy.enable = true;
       };
 
       diagnostics = {
@@ -341,7 +335,7 @@ in {
           severity.__raw = "vim.diagnostic.severity.WARN";
         };
       };
-      globals.mapleader = " ";
+
       highlight = {
         Comment.fg = "#ff00ff";
         Comment.bg = "#000000";
@@ -500,12 +494,36 @@ in {
             dockerls.enable = true; # Docker
             bashls.enable = true; # Bash
           };
+          keymaps = {
+            silent = true;
+            diagnostic = {
+              # Navigate in diagnostics
+              "<leader>k" = "goto_prev";
+              "<leader>j" = "goto_next";
+            };
+
+            lspBuf = {
+              gd = "definition";
+              gr = "references";
+              gt = "type_definition";
+              gi = "implementation";
+              K = "hover";
+              re = "rename";
+            };
+          };
         };
       };
+      autoCmd = [
+        {
+          event = "TextYankPost";
+          pattern = "*";
+          command = "lua vim.highlight.on_yank{timeout=500}";
+        }
+      ];
       keymaps = [
         # Neo-tree bindings
         {
-          action = "<cmd>Neotree toggle<CR>";
+          action = "<cmd>Oil<CR>";
           key = "<leader>e";
         }
 
@@ -513,42 +531,17 @@ in {
 
         {
           action = "<cmd>Telescope live_grep<CR>";
-          key = "<leader>fw";
+          key = "<leader>sg";
         }
         {
           action = "<cmd>Telescope find_files<CR>";
-          key = "<leader>ff";
+          key = "<leader>sf";
         }
-        {
-          action = "<cmd>Telescope git_commits<CR>";
-          key = "<leader>fg";
-        }
-        {
-          action = "<cmd>Telescope oldfiles<CR>";
-          key = "<leader>fh";
-        }
-        {
-          action = "<cmd>Telescope colorscheme<CR>";
-          key = "<leader>ch";
-        }
+
         {
           action = "<cmd>Telescope man_pages<CR>";
-          key = "<leader>fm";
+          key = "<leader>sm";
         }
-
-        # Notify bindings
-
-        {
-          mode = "n";
-          key = "<leader>un";
-          action = ''
-            <cmd>lua require("notify").dismiss({ silent = true, pending = true })<cr>
-          '';
-          options = {
-            desc = "Dismiss All Notifications";
-          };
-        }
-
         # Bufferline bindings
 
         {
@@ -568,16 +561,6 @@ in {
             desc = "Cycle to previous buffer";
           };
         }
-
-        {
-          mode = "n";
-          key = "<S-l>";
-          action = "<cmd>BufferLineCycleNext<cr>";
-          options = {
-            desc = "Cycle to next buffer";
-          };
-        }
-
         {
           mode = "n";
           key = "<S-h>";
