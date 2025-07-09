@@ -164,6 +164,7 @@
       packages = with pkgs; [
         zathura
         dbeaver-bin
+        anki-bin
         # inkscape
         # visualvm
       ];
