@@ -348,11 +348,6 @@ in {
 
         which-key = {
           enable = true;
-          registrations = {
-            "<leader>fg" = "Find Git files with telescope";
-            "<leader>fw" = "Find text with telescope";
-            "<leader>ff" = "Find files with telescope";
-          };
         };
 
         render-markdown = {
