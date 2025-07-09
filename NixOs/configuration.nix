@@ -543,7 +543,7 @@ in {
         }
         {
           action = "<cmd>Telescope quickfix<CR>";
-          key = "<leader> sq";
+          key = "<leader>sq";
           options.desc = "Search Quickfix";
         }
         # Bufferline bindings
@@ -551,7 +551,7 @@ in {
         {
           mode = "n";
           key = "<Tab>";
-          action = "<cmd>BufferLineCycleNext<cr>";
+          action = "]b";
           options = {
             desc = "Cycle to next buffer";
           };
@@ -560,7 +560,7 @@ in {
         {
           mode = "n";
           key = "<S-Tab>";
-          action = "<cmd>BufferLineCyclePrev<cr>";
+          action = "[b";
           options = {
             desc = "Cycle to previous buffer";
           };
