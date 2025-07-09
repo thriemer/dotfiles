@@ -491,6 +491,13 @@ in {
                 port = 5005;
               }
             ];
+            rust = [
+              {
+                name = "Rust debug";
+                type = "codelldb";
+                request = "launch";
+              }
+            ];
           };
         };
 
@@ -574,6 +581,17 @@ in {
           key = "<leader>sq";
           options.desc = "Search Quickfix";
         }
+        {
+          action = "<cmd>Telescope buffers<CR>";
+          key = "<leader>sb";
+          options.desc = "Search Buffer";
+        }
+        {
+          action = "<cmd>Telescope current_buffer_fuzzy_find<CR>";
+          key = "<leader>/";
+          options.desc = "Search Buffer";
+        }
+
         # Bufferline bindings
 
         {
