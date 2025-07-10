@@ -529,17 +529,8 @@ in {
             silent = true;
             diagnostic = {
               # Navigate in diagnostics
-              "<leader>k" = "goto_prev";
-              "<leader>j" = "goto_next";
-            };
-
-            lspBuf = {
-              gd = "definition";
-              gr = "references";
-              gt = "type_definition";
-              gi = "implementation";
-              K = "hover";
-              re = "rename";
+              "gdp" = "goto_prev";
+              "gdn" = "goto_next";
             };
           };
         };
