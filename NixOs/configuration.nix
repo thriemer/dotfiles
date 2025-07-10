@@ -176,10 +176,6 @@
 
   system = {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
-    autoUpgrade = {
-      enable = true;
-      dates = "06:00";
-    };
   };
 
   # List packages installed in system profile. To search, run:
