@@ -2,10 +2,19 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  nixvim = import (
+    builtins.fetchGit {
+      url = "https://github.com/nix-community/nixvim";
+      # If you are not running an unstable channel of nixpkgs, select the corresponding branch of nixvim.
+      # ref = "nixos-25.05";
+    }
+  );
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    nixvim.nixosModules.nixvim
   ];
   nix = {
     settings.experimental-features = [
@@ -242,8 +251,385 @@
       xwayland.enable = true;
     };
     fish.enable = true;
-    neovim = {
+
+    nixvim = {
       enable = true;
+      globals.mapleader = " ";
+      opts = {
+        # Line numbers
+        number = true;
+        relativenumber = true;
+
+        # Enable more colors (24-bit)
+        termguicolors = true;
+
+        # Have a better completion experience
+        completeopt = [
+          "menuone"
+          "noselect"
+          "noinsert"
+        ];
+
+        # Always show the signcolumn, otherwise text would be shifted when displaying error icons
+        signcolumn = "yes";
+
+        # Enable mouse
+        mouse = "a";
+
+        # Search
+        ignorecase = true;
+        smartcase = true;
+
+        # Configure how new splits should be opened
+        splitright = true;
+        splitbelow = true;
+
+        list = true;
+        # NOTE: .__raw here means that this field is raw lua code
+        listchars.__raw = "{ tab = '» ', trail = '·', nbsp = '␣' }";
+
+        expandtab = true;
+        # tabstop = 4;
+        shiftwidth = 2;
+        # softtabstop = 0;
+        # smarttab = true;
+
+        # Set encoding
+        encoding = "utf-8";
+        fileencoding = "utf-8";
+
+        # Save undo history
+        undofile = true;
+        swapfile = true;
+        backup = false;
+        autoread = true;
+
+        # Highlight the current line for cursor
+        cursorline = true;
+
+        # Show line and column when searching
+        ruler = true;
+
+        # Global substitution by default
+        gdefault = true;
+
+        # Start scrolling when the cursor is X lines away from the top/bottom
+        scrolloff = 5;
+      };
+      # System clipboard support, needs xclip/wl-clipboard
+      clipboard = {
+        # Use system clipboard
+        register = "unnamedplus";
+        providers.wl-copy.enable = true;
+      };
+
+      diagnostics = {
+        update_in_insert = true;
+        severity_sort = true;
+        float = {
+          border = "rounded";
+        };
+        jump = {
+          severity.__raw = "vim.diagnostic.severity.WARN";
+        };
+      };
+
+      highlight = {
+        Comment.fg = "#ff00ff";
+        Comment.bg = "#000000";
+        Comment.underline = true;
+        Comment.bold = true;
+      };
+
+      plugins = {
+        molten = {
+          settings = {
+            use_border_highlights = true;
+            output_virt_lines = true;
+            virt_lines_off_by_1 = true;
+            image_provider = "image.nvim";
+          };
+          enable = true;
+        };
+        image = {
+          settings = {
+            backend = "kitty";
+          };
+          enable = true;
+          settings = {
+            markdown = {
+              enabled = true;
+              downloadRemoteImages = true;
+              filetypes = [
+                "markdown"
+                "vimwiki"
+                "mdx"
+              ];
+            };
+          };
+        };
+        quarto = {
+          settings = {
+            codeRunner = {
+              default_method = "molten";
+            };
+          };
+          enable = true;
+        };
+        jupytext = {
+          settings = {
+            style = "markdown";
+            output_extension = "md";
+            force_ft = "markdown";
+          };
+          enable = true;
+          package = pkgs.vimUtils.buildVimPlugin {
+            pname = "jupytext.nvim";
+            version = "0.0.0";
+            src = pkgs.fetchgit {
+              url = "https://github.com/bkp5190/jupytext.nvim";
+              branchName = "deprecated-healthcheck";
+              rev = "695295069a3aac0cf9a1b768589216c5b837b6f1";
+              sha256 = "sha256-W6fkL1w2dYSjpAYOtBTlYjd2CMYPB596NQzBylIVHrE=";
+            };
+          };
+        };
+        otter.enable = true;
+        oil.enable = true;
+
+        which-key = {
+          enable = true;
+        };
+
+        render-markdown = {
+          enable = true;
+        };
+
+        none-ls = {
+          enable = true;
+          settings = {
+            cmd = ["bash -c nvim"];
+            debug = true;
+          };
+          sources = {
+            code_actions = {
+              statix.enable = true;
+              gitsigns.enable = true;
+            };
+            diagnostics = {
+              statix.enable = true;
+              deadnix.enable = true;
+              pylint.enable = true;
+              checkstyle.enable = true;
+            };
+            formatting = {
+              alejandra.enable = true;
+              stylua.enable = true;
+              shfmt.enable = true;
+              google_java_format.enable = false;
+              prettier = {
+                enable = true;
+                disableTsServerFormatter = true;
+              };
+              black = {
+                enable = true;
+                settings = ''
+                  {
+                    extra_args = { "--fast" },
+                  }
+                '';
+              };
+            };
+            completion = {
+              luasnip.enable = true;
+              spell.enable = true;
+            };
+          };
+        };
+        dap = {
+          enable = true;
+          signs = {
+            dapBreakpoint = {
+              text = "●";
+              texthl = "DapBreakpoint";
+            };
+            dapBreakpointCondition = {
+              text = "●";
+              texthl = "DapBreakpointCondition";
+            };
+            dapLogPoint = {
+              text = "◆";
+              texthl = "DapLogPoint";
+            };
+          };
+          extensions = {
+            dap-python = {
+              enable = true;
+            };
+            dap-ui = {
+              enable = true;
+              floating.mappings = {
+                close = [
+                  "<ESC>"
+                  "q"
+                ];
+              };
+            };
+            dap-virtual-text = {
+              enable = true;
+            };
+          };
+          configurations = {
+            java = [
+              {
+                type = "java";
+                request = "launch";
+                name = "Debug (Attach) - Remote";
+                hostName = "127.0.0.1";
+                port = 5005;
+              }
+            ];
+            rust = [
+              {
+                name = "Rust debug";
+                type = "codelldb";
+                request = "launch";
+              }
+            ];
+          };
+        };
+
+        # Git signs in code
+        gitsigns = {
+          enable = true;
+          settings.current_line_blame = true;
+        };
+        telescope = {
+          enable = true;
+          extensions = {
+            fzf-native = {
+              enable = true;
+            };
+          };
+        };
+        lsp-format.enable = true;
+        lsp = {
+          enable = true;
+          inlayHints = true;
+          servers = {
+            rust_analyzer = {
+              enable = true;
+              installRustc = true;
+              installCargo = true;
+            };
+            pyright.enable = true; # Python
+            nil_ls.enable = true; # Nix
+            dockerls.enable = true; # Docker
+            bashls.enable = true; # Bash
+          };
+          keymaps = {
+            silent = true;
+            diagnostic = {
+              # Navigate in diagnostics
+              "<leader>k" = "goto_prev";
+              "<leader>j" = "goto_next";
+            };
+
+            lspBuf = {
+              gd = "definition";
+              gr = "references";
+              gt = "type_definition";
+              gi = "implementation";
+              K = "hover";
+              re = "rename";
+            };
+          };
+        };
+      };
+      autoCmd = [
+        {
+          event = "TextYankPost";
+          pattern = "*";
+          command = "lua vim.highlight.on_yank{timeout=500}";
+        }
+      ];
+      keymaps = [
+        {
+          action = ":Oil<CR>";
+          key = "<leader>e";
+        }
+
+        # Telescope bindings
+
+        {
+          action = "<cmd>Telescope live_grep<CR>";
+          key = "<leader>sg";
+        }
+        {
+          action = "<cmd>Telescope find_files<CR>";
+          key = "<leader>sf";
+        }
+
+        {
+          action = "<cmd>Telescope man_pages<CR>";
+          key = "<leader>sm";
+        }
+        {
+          action = "<cmd>Telescope quickfix<CR>";
+          key = "<leader>sq";
+          options.desc = "Search Quickfix";
+        }
+        {
+          action = "<cmd>Telescope buffers<CR>";
+          key = "<leader>sb";
+          options.desc = "Search Buffer";
+        }
+        {
+          action = "<cmd>Telescope current_buffer_fuzzy_find<CR>";
+          key = "<leader>/";
+          options.desc = "Search Buffer";
+        }
+
+        # Bufferline bindings
+
+        {
+          mode = "n";
+          key = "<Tab>";
+          action = "]b";
+          options = {
+            desc = "Cycle to next buffer";
+          };
+        }
+
+        {
+          mode = "n";
+          key = "<S-Tab>";
+          action = "[b";
+          options = {
+            desc = "Cycle to previous buffer";
+          };
+        }
+        {
+          mode = "n";
+          key = "<S-h>";
+          action = "<cmd>lua vim.diagnostic.open_float()<cr>";
+
+          options = {
+            desc = "Open diagonstics";
+          };
+        }
+
+        {
+          mode = "n";
+          key = "<leader>bd";
+          action = "<cmd>bdelete<cr>";
+          options = {
+            desc = "Delete buffer";
+          };
+        }
+      ];
+      colorschemes.catppuccin.enable = true;
+      plugins.lualine.enable = true;
       defaultEditor = true;
     };
     ssh.startAgent = true; # remeber private keys so that i dont have to type them in again
