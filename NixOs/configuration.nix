@@ -285,7 +285,6 @@ in {
         splitbelow = true;
 
         list = true;
-        # NOTE: .__raw here means that this field is raw lua code
         listchars.__raw = "{ tab = '» ', trail = '·', nbsp = '␣' }";
 
         expandtab = true;
@@ -394,7 +393,6 @@ in {
             };
           };
         };
-        otter.enable = true;
         oil.enable = true;
 
         which-key = {
