@@ -187,6 +187,7 @@
     ffmpeg
     gimp
     openconnect
+    kdePackages.ark
     kdePackages.dolphin
 
     # hyprland
