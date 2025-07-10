@@ -520,7 +520,7 @@ in {
               installRustc = true;
               installCargo = true;
             };
-            pyright.enable = true; # Python
+            basedpyright.enable = true; # Python
             nil_ls.enable = true; # Nix
             dockerls.enable = true; # Docker
             bashls.enable = true; # Bash
@@ -548,7 +548,7 @@ in {
         {
           event = "TextYankPost";
           pattern = "*";
-          command = "lua vim.highlight.on_yank{timeout=500}";
+          command = "lua vim.highlight.on_yank{timeout=250}";
         }
       ];
       keymaps = [
