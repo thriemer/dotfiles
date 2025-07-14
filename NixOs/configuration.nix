@@ -198,6 +198,7 @@ in {
     openconnect
     kdePackages.ark
     kdePackages.dolphin
+    vlc
 
     # hyprland
     wofi
@@ -245,6 +246,7 @@ in {
   ];
 
   programs = {
+    kdeconnect.enable = true;
     hyprland = {
       enable = true;
       withUWSM = true;
