@@ -48,7 +48,10 @@ in {
 
   # Enable networking
   networking = {
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      enableStrongSwan = true;
+    };
     wireguard.enable = true;
     firewall.checkReversePath = false; # so that the wireguard vpn works
   };
@@ -124,7 +127,6 @@ in {
       enable = true;
       settings.PasswordAuthentication = false;
     };
-    strongswan = {enable = true;};
   };
 
   # Configure console keymap
