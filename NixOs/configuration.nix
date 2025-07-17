@@ -58,7 +58,7 @@ in {
       enableStrongSwan = true;
     };
     wireguard.enable = true;
-    firewall.checkReversePath = false; # so that the wireguard vpn works
+    firewall.enable = false; # so that the wireguard vpn works
   };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
