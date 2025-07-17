@@ -124,6 +124,7 @@ in {
       enable = true;
       settings.PasswordAuthentication = false;
     };
+    strongswan = {enable = true;};
   };
 
   # Configure console keymap
