@@ -53,6 +53,8 @@ in {
       plugins = [
         pkgs.networkmanager-openconnect
         pkgs.networkmanager-openvpn
+        pkgs.networkmanager-vpnc
+        pkgs.networkmanager-l2tp
       ];
       enableStrongSwan = true;
     };
