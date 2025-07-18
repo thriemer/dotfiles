@@ -583,8 +583,8 @@ in {
             silent = true;
             diagnostic = {
               # Navigate in diagnostics
-              "gdp" = "goto_prev";
-              "gdn" = "goto_next";
+              "grdp" = "goto_prev";
+              "grdn" = "goto_next";
             };
           };
         };
