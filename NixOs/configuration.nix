@@ -413,7 +413,71 @@ in {
         render-markdown = {
           enable = true;
         };
-
+        conform-nvim = {
+          enable = true;
+          settings = {
+            format_on_save = {
+              lspFallback = true;
+              timeoutMs = 500;
+            };
+            notify_on_error = true;
+            formatters_by_ft = {
+              html = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              css = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              rust = [["rustfmt"]];
+              javascript = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              javascriptreact = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              typescript = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              typescriptreact = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              python = ["black"];
+              lua = ["stylua"];
+              nix = ["nixfmt"];
+              markdown = [
+                [
+                  "prettierd"
+                  "prettier"
+                ]
+              ];
+              yaml = [
+                "yamllint"
+                "yamlfmt"
+              ];
+              terragrunt = ["hcl"];
+              bash = ["shfmt"];
+              sh = ["shfmt"];
+            };
+          };
+        };
         none-ls = {
           enable = true;
           settings = {
@@ -430,28 +494,6 @@ in {
               deadnix.enable = true;
               pylint.enable = true;
               checkstyle.enable = true;
-            };
-            formatting = {
-              alejandra.enable = true;
-              stylua.enable = true;
-              shfmt.enable = true;
-              google_java_format.enable = false;
-              prettier = {
-                enable = true;
-                disableTsServerFormatter = true;
-              };
-              black = {
-                enable = true;
-                settings = ''
-                  {
-                    extra_args = { "--fast" },
-                  }
-                '';
-              };
-            };
-            completion = {
-              luasnip.enable = true;
-              spell.enable = true;
             };
           };
         };
