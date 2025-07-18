@@ -237,6 +237,7 @@ in {
     # Misc
     alejandra # formatting nix files
     libnotify
+    rustfmt
     stow
     tmux
     lazygit
