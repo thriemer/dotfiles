@@ -251,6 +251,7 @@ in {
 
     # insta 360
     wineWowPackages.stable
+    bottles
   ];
 
   fonts.packages = with pkgs; [
