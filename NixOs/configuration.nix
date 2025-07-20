@@ -248,6 +248,9 @@ in {
     stylua
     ripgrep
     luarocks
+
+    # insta 360
+    wineWowPackages.stable
   ];
 
   fonts.packages = with pkgs; [
