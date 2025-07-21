@@ -196,65 +196,67 @@ in {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
   };
 
-  environment.stub-ld.enable = true;
-  # List packages installed in system profile. To search, run:
-  environment.systemPackages = with pkgs; [
-    displaylink
-    firefox
-    thunderbird
-    keepassxc
-    ffmpeg
-    gimp
-    openconnect
-    kdePackages.ark
-    kdePackages.dolphin
-    vlc
+  environment = {
+    stub-ld.enable = true;
+    # List packages installed in system profile. To search, run:
+    systemPackages = with pkgs; [
+      displaylink
+      firefox
+      thunderbird
+      keepassxc
+      ffmpeg
+      gimp
+      openconnect
+      kdePackages.ark
+      kdePackages.dolphin
+      vlc
 
-    # hyprland
-    wofi
-    kitty
-    waybar
-    networkmanagerapplet
-    dunst
-    hyprpaper
-    hyprlock
-    hypridle
-    playerctl
-    pavucontrol
-    wlogout
-    copyq
+      # hyprland
+      wofi
+      kitty
+      waybar
+      networkmanagerapplet
+      dunst
+      hyprpaper
+      hyprlock
+      hypridle
+      playerctl
+      pavucontrol
+      wlogout
+      copyq
 
-    # Development
-    gcc
-    git
-    jetbrains.idea-ultimate
-    temurin-bin-24
-    jetbrains.rust-rover
-    jetbrains.pycharm-professional
-    unzip
-    gzip
-    wget
-    docker-compose
+      # Development
+      gcc
+      git
+      jetbrains.idea-ultimate
+      temurin-bin-24
+      jetbrains.rust-rover
+      jetbrains.pycharm-professional
+      unzip
+      gzip
+      wget
+      docker-compose
 
-    # Misc
-    alejandra # formatting nix files
-    libnotify
-    rustfmt
-    stow
-    tmux
-    lazygit
+      # Misc
+      alejandra # formatting nix files
+      libnotify
+      rustfmt
+      stow
+      tmux
+      lazygit
 
-    # Vim
-    vscodium
-    tree-sitter
-    stylua
-    ripgrep
-    luarocks
+      # Vim
+      vscodium
+      tree-sitter
+      stylua
+      ripgrep
+      luarocks
 
-    # insta 360
-    wineWowPackages.stable
-    bottles
-  ];
+      # insta 360
+      wineWowPackages.stable
+      bottles
+    ];
+  };
 
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
@@ -262,6 +264,15 @@ in {
   ];
 
   programs = {
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        curl
+        xz
+        openssl
+      ];
+    };
+
     kdeconnect.enable = true;
     hyprland = {
       enable = true;
