@@ -236,6 +236,9 @@ in {
       gzip
       wget
       docker-compose
+      curl
+      xz
+      openssl
 
       # Misc
       alejandra # formatting nix files
