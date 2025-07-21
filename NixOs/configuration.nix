@@ -160,6 +160,7 @@ in {
       ];
       packages = with pkgs; [
         slack
+        mattermost
         kubectl
         kubelogin
         zoom-us
