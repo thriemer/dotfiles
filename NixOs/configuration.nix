@@ -227,7 +227,6 @@ in {
     gcc
     git
     jetbrains.idea-ultimate
-    jdk23
     jetbrains.rust-rover
     jetbrains.pycharm-professional
     unzip
