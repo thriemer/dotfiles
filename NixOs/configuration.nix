@@ -28,6 +28,9 @@ in {
       options = "--delete-older-than 15d";
     };
   };
+  nixpkgs.config.permittedInsecurePackages = [
+    "openssl-1.1.1w"
+  ];
 
   # Bootloader.
   boot = {
@@ -270,9 +273,13 @@ in {
     nix-ld = {
       enable = true;
       libraries = with pkgs; [
-        curl
-        xz
-        openssl
+        openssl_1_1 # Provides libcrypto.so.1.1 and libssl.so.1.1
+        curl # Provides libcurl.so.4
+        xz # Provides liblzma.so.5
+        # Include common dependencies to prevent future issues
+        zlib
+        glibc
+        stdenv.cc.cc
       ];
     };
 
