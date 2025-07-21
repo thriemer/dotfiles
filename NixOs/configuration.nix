@@ -196,6 +196,7 @@ in {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
   };
 
+  environment.stub-ld.enable = true;
   # List packages installed in system profile. To search, run:
   environment.systemPackages = with pkgs; [
     displaylink
