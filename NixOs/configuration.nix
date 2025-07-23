@@ -167,6 +167,7 @@ in {
         graphviz
         databricks-cli
         awscli
+        mongodb-compass
         (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
         (pkgs.callPackage /home/work/software/insomnium.nix {})
         (pkgs.callPackage /home/work/software/freelens.nix {})
