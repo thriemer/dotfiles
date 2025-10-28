@@ -54,7 +54,7 @@ config_file=$(pwd)/configuration.nix
 echo "NixOS Rebuilding... using file: $config_file"
 
 # Rebuild, output simplified errors, log trackebacks
-sudo nixos-rebuild switch -I nixos-config=$config_file --upgrade
+sudo nixos-rebuild switch -I nixos-config=$config_file --upgrade --use-substitutes
 
 # Get current generation metadata
 current=$(nixos-rebuild list-generations | grep current)

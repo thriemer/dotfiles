@@ -2,27 +2,73 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  unstable = import <unstable> {
+    config = config.nixpkgs.config;
+  };
+in {
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";}))
+  ];
+
   imports = [
-    # Include the results of the hardware scan.
+    # Include the results of the hardware scan..
     ./hardware-configuration.nix
   ];
+
+  nix = {
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    optimise.automatic = true;
+    gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 15d";
+    };
+  };
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "openssl-1.1.1w"
+  ];
+
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = ["ntfs"];
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    supportedFilesystems = ["ntfs"];
+    initrd.kernelModules = [
+      "nvidia"
+      "evdi"
+    ];
+    extraModulePackages = [
+      config.boot.kernelPackages.nvidia_x11
+      config.boot.kernelPackages.evdi
+    ];
+    binfmt.emulatedSystems = ["aarch64-linux"];
+  };
 
   networking.hostName = "linus-x1"; # Define your hostname.
 
   # Enable networking
-  networking.networkmanager.enable = true;
-  networking.wireless.iwd.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
-
+  networking = {
+    networkmanager = {
+      enable = true;
+      plugins = [
+        pkgs.networkmanager-openconnect
+        pkgs.networkmanager-openvpn
+        pkgs.networkmanager-vpnc
+        pkgs.networkmanager-l2tp
+      ];
+      enableStrongSwan = true;
+    };
+    wireguard.enable = true;
+    firewall.enable = false; # so that the wireguard vpn works
+  };
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
@@ -46,9 +92,9 @@
       modesetting.enable = true;
       open = true;
       nvidiaSettings = true;
-      powerManagement.enable = false;
+      powerManagement.enable = true;
       prime = {
-        sync.enable = true; #offload gpu heavy tasks to nvidia, the dedicated gpu is never really sleeping
+        sync.enable = true; # offload gpu heavy tasks to nvidia, the dedicated gpu is never really sleeping
         nvidiaBusId = "PCI:1:0:0";
         intelBusId = "PCI:0:2:0";
       };
@@ -62,17 +108,21 @@
       defaultSession = "hyprland-uwsm";
       sddm.enable = true;
     };
-
     # Configure graphics
     xserver = {
       enable = true;
-      videoDrivers = ["displaylink" "modesetting" "nvidia"];
+      videoDrivers = [
+        "displaylink"
+        "modesetting"
+        "nvidia"
+      ];
       xkb = {
         layout = "de";
         variant = "";
       };
     };
     printing.enable = true;
+    envfs.enable = true; # enable bash for scripts that assume hard coded shebang
     gvfs.enable = true;
     udisks2.enable = true;
     blueman.enable = true;
@@ -96,109 +146,152 @@
     setSocketVariable = true;
   };
 
-  # Enable CUPS to print documents.
-  boot.initrd.kernelModules = ["nvidia" "evdi"];
-  boot.extraModulePackages = [config.boot.kernelPackages.nvidia_x11 config.boot.kernelPackages.evdi];
-
-  # Enable sound with pipewire.
-
   security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.work = {
-    isNormalUser = true;
-    description = "Linus";
-    extraGroups = ["networkmanager" "wheel" "netdev"];
-    packages = with pkgs; [
-      slack
-      kubectl
-      kubelogin
-      lens
-      zoom-us
-      graphviz
-    ];
-  };
+  users = {
+    mutableUsers = true;
+    users.work = {
+      isNormalUser = true;
+      description = "Linus";
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "netdev"
+      ];
+      packages = with pkgs; [
+        slack
+        mattermost
+        kubectl
+        kubelogin
+        zoom-us
+        graphviz
+        databricks-cli
+        awscli
+        poetry
+        mongodb-compass
+        (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
+        (pkgs.callPackage /home/work/software/insomnium.nix {})
+        (pkgs.callPackage /home/work/software/freelens.nix {})
+      ];
+    };
 
-  users.users.private = {
-    uid = 1030;
-    isNormalUser = true;
-    home = "/home/private";
-    description = "Private Linus";
-    extraGroups = ["wheel" "networkmanager" "netdev"];
-    packages = with pkgs; [
-      zathura
-      # dbeaver-bin
-      # inkscape
-      # visualvm
-    ];
+    users.private = {
+      uid = 1030;
+      isNormalUser = true;
+      home = "/home/private";
+      description = "Private Linus";
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "netdev"
+      ];
+      packages = with pkgs; [
+        zathura
+        dbeaver-bin
+        anki-bin
+        kdePackages.kdenlive
+        signal-desktop
+        # inkscape
+        # visualvm
+      ];
+    };
   };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  nix.optimise.automatic = true;
-  nix.gc = {
-    automatic = true;
-    dates = "daily";
-    options = "--delete-older-than 15d";
-  };
   system = {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
-    autoUpgrade = {
-      enable = true;
-      dates = "06:00";
-    };
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    displaylink
-    firefox
-    thunderbird
-    keepassxc
-    ffmpeg
-    gimp
-    insomnia
-    openconnect
-    alacritty
+  environment = {
+    stub-ld.enable = true;
+    # List packages installed in system profile. To search, run:
+    systemPackages = with pkgs; [
+      sops
+      displaylink
+      firefox
+      thunderbird
+      keepassxc
+      ffmpeg
+      gimp
+      openconnect
+      kdePackages.ark
+      kdePackages.dolphin
+      vlc
+      htop
+      spotify-player
 
-    # hyprland
-    wofi
-    kitty
-    waybar
-    networkmanagerapplet
-    dunst
-    hyprpaper
-    playerctl
-    pavucontrol
+      # hyprland
+      wofi
+      kitty
+      waybar
+      networkmanagerapplet
+      dunst
+      hyprpaper
+      hyprlock
+      hypridle
+      playerctl
+      pavucontrol
+      wlogout
+      copyq
+      wl-clipboard
+      # screenshot
+      slurp
+      grim
 
-    # Development
-    # (python310.withPackages (ps: with ps; [pandas matplotlib]))
-    # cargo
-    #  rustup
-    gcc
-    git
-    #    jetbrains.idea-ultimate
-    #    jetbrains.rust-rover
-    unzip
-    gzip
-    wget
-    docker-compose
+      # Development
+      gcc
+      git
+      jetbrains.idea-ultimate
+      temurin-bin-24
+      jetbrains.rust-rover
+      jetbrains.pycharm-professional
+      unzip
+      gzip
+      wget
+      docker-compose
+      curl
+      xz
+      openssl
+      rustup
+      vscode
 
-    # Misc
-    alejandra # formatting nix files
-    libnotify
-    stow
-    # sysstat
-    tmux
-    lazygit
-    # Vim
-    vscodium
-    tree-sitter
-    stylua
-    ripgrep
-    luarocks
-  ];
+      # Misc
+      alejandra # formatting nix files
+      libnotify
+      stow
+      tmux
+      lazygit
+      ydotool
+
+      # Vim
+      # language servers
+      lua-language-server
+      rust-analyzer
+      nil
+      basedpyright
+      unstable.pyrefly
+
+      # Uni
+      typst
+      typstfmt
+      tinymist
+
+      # formatters
+      rustfmt
+      ruff
+      prettierd
+      stylua
+      xmlformat
+      shfmt
+
+      # insta 360
+      wineWowPackages.stable
+      bottles
+      gnupg
+    ];
+  };
 
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
@@ -206,24 +299,36 @@
   ];
 
   programs = {
+    neovim = {
+      enable = true;
+      defaultEditor = true;
+    };
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        openssl_1_1 # Provides libcrypto.so.1.1 and libssl.so.1.1
+        curl # Provides libcurl.so.4
+        xz # Provides liblzma.so.5
+        # Include common dependencies to prevent future issues
+        zlib
+        glibc
+        stdenv.cc.cc
+      ];
+    };
+
+    kdeconnect.enable = true;
     hyprland = {
       enable = true;
       withUWSM = true;
       xwayland.enable = true;
     };
     fish.enable = true;
-    neovim = {
+    ssh.startAgent = true; # remeber private keys so that i dont have to type them in again
+    appimage = {
       enable = true;
-      defaultEditor = true;
+      binfmt = true;
     };
-    ssh.startAgent = true; #remeber private keys so that i dont have to type them in again
   };
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

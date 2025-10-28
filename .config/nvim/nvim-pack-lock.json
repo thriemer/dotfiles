@@ -1,0 +1,15 @@
+{
+  "plugins": {
+    "conform.nvim": [],
+    "mini.nvim": [],
+    "nvim": [],
+    "nvim-lspconfig": [],
+    "oil.nvim": [],
+    "smear-cursor.nvim": [],
+    "typst-preview.nvim": {
+      "rev": "1603d37",
+      "src": "https://github.com/chomosuke/typst-preview.nvim"
+    },
+    "which-key.nvim": []
+  }
+}
