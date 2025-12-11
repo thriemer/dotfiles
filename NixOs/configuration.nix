@@ -1,26 +1,21 @@
 {
   config,
   pkgs,
+  inputs,
   ...
-}: let
-  unstable = import <unstable> {
-    config = config.nixpkgs.config;
-  };
-in {
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {url = "https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz";}))
-  ];
-
+}: {
   imports = [
     # Include the results of the hardware scan..
     ./hardware-configuration.nix
   ];
 
   nix = {
-    settings.experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+    };
     optimise.automatic = true;
     gc = {
       automatic = true;
@@ -29,9 +24,13 @@ in {
     };
   };
 
-  nixpkgs.config.permittedInsecurePackages = [
-    "openssl-1.1.1w"
-  ];
+  nixpkgs = {
+    config = {
+      permittedInsecurePackages = [
+        "openssl-1.1.1w"
+      ];
+    };
+  };
 
   # Bootloader.
   boot = {
@@ -154,6 +153,7 @@ in {
       isNormalUser = true;
       description = "Linus";
       extraGroups = [
+        "dialout"
         "networkmanager"
         "wheel"
         "netdev"
@@ -181,6 +181,7 @@ in {
       home = "/home/private";
       description = "Private Linus";
       extraGroups = [
+        "dialout"
         "wheel"
         "networkmanager"
         "netdev"
@@ -233,6 +234,7 @@ in {
       hypridle
       playerctl
       pavucontrol
+      brightnessctl
       wlogout
       copyq
       wl-clipboard
@@ -247,6 +249,7 @@ in {
       temurin-bin-24
       jetbrains.rust-rover
       jetbrains.pycharm-professional
+      uv
       unzip
       gzip
       wget
@@ -271,7 +274,6 @@ in {
       rust-analyzer
       nil
       basedpyright
-      unstable.pyrefly
 
       # Uni
       typst
@@ -302,6 +304,7 @@ in {
     neovim = {
       enable = true;
       defaultEditor = true;
+      package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
     };
     nix-ld = {
       enable = true;

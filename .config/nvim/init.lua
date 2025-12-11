@@ -116,29 +116,49 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 vim.pack.add({
-	{ src = "https://github.com/stevearc/oil.nvim" },
-	{ src = "https://github.com/sphamba/smear-cursor.nvim" },
-	{ src = "https://github.com/neovim/nvim-lspconfig" },
+	-- Eye Candy
+	{ src = "https://github.com/sphamba/smear-cursor.nvim" }, -- Nice animations
+	{ src = "https://github.com/catppuccin/nvim" }, -- color theme
+	{ src = "https://github.com/nvim-tree/nvim-web-devicons" }, -- nice icons
+	{ src = "https://github.com/nvim-lualine/lualine.nvim" }, -- nicer status line
+	{ src = "https://github.com/folke/which-key.nvim" }, -- Key help
+	-- misc until now
+	{ src = "https://github.com/stevearc/oil.nvim" }, -- File explorer
+	{ src = "https://github.com/neovim/nvim-lspconfig" }, -- LSP
 	{ src = "https://github.com/echasnovski/mini.nvim" },
-	{ src = "https://github.com/folke/which-key.nvim" },
-	{ src = "https://github.com/stevearc/conform.nvim" },
-	{ src = "https://github.com/chomosuke/typst-preview.nvim" },
-	{ src = "https://github.com/catppuccin/nvim" },
+	{ src = "https://github.com/stevearc/conform.nvim" }, -- formatting
+	{ src = "https://github.com/chomosuke/typst-preview.nvim" }, -- typst file editing
+	{ src = "https://github.com/Saecki/crates.nvim" }, -- rust cargo toml support
+	{ src = "https://github.com/folke/flash.nvim" },
+	-- completion
+	{ src = "https://github.com/hrsh7th/nvim-cmp" }, -- The completion engine
+	{ src = "https://github.com/hrsh7th/cmp-nvim-lsp" }, -- LSP as a completion source
+	{ src = "https://github.com/hrsh7th/cmp-buffer" }, -- Suggests words from open buffers
+	{ src = "https://github.com/hrsh7th/cmp-path" }, -- Suggests file system paths
+	{ src = "https://github.com/L3MON4D3/LuaSnip" }, -- Snippet engine (optional but recommended)
+	{ src = "https://github.com/saadparwaiz1/cmp_luasnip" }, -- Snippets as a completion source
 })
 
-vim.lsp.enable({ "rust_analyzer", "basedpyright", "lua_ls", "nil_ls", "tinymist", "pyrefly" })
+vim.lsp.enable({
+	"rust_analyzer",
+	"lua_ls",
+	"nil_ls",
+	"tinymist",
+	"basedpyright",
+})
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(ev)
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
-		if client:supports_method("textDocument/completion") then
-			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-		end
+		local capabilities = require("cmp_nvim_lsp").default_capabilities()
+		client.server_capabilities = vim.tbl_deep_extend("force", client.server_capabilities, capabilities)
 	end,
 })
+
 vim.cmd("set completeopt+=noselect")
 
 require("oil").setup()
+require("crates").setup()
 require("smear_cursor").setup()
 require("mini.pick").setup()
 require("which-key").setup()
@@ -158,14 +178,44 @@ require("conform").setup({
 		python = { "ruff" },
 		typst = { "typstfmt" },
 	},
-	-- Set up format-on-save
-	format_on_save = { timeout_ms = 500, lsp_fallback = true },
 	-- Customize formatters
 	formatters = {
 		shfmt = {
 			prepend_args = { "-i", "2" },
 		},
 	},
+})
+require("lualine").setup()
+
+local cmp = require("cmp")
+local luasnip = require("luasnip")
+
+cmp.setup({
+	snippet = {
+		expand = function(args)
+			luasnip.lsp_expand(args.body)
+		end,
+	},
+	window = {
+		completion = cmp.config.window.bordered(),
+		documentation = cmp.config.window.bordered(),
+	},
+	mapping = cmp.mapping.preset.insert({
+		["<C-n>"] = cmp.mapping.select_next_item(),
+		["<C-p>"] = cmp.mapping.select_prev_item(),
+		["<C-b>"] = cmp.mapping.scroll_docs(-4),
+		["<C-f>"] = cmp.mapping.scroll_docs(4),
+		["<C-Space>"] = cmp.mapping.complete(),
+		["<C-e>"] = cmp.mapping.abort(),
+		["<CR>"] = cmp.mapping.confirm({ select = false }), -- Set to `true` to auto-select first item
+	}),
+	sources = cmp.config.sources({
+		{ name = "nvim_lsp" },
+		{ name = "luasnip" },
+	}, {
+		{ name = "buffer" },
+		{ name = "path" },
+	}),
 })
 
 vim.keymap.set("n", "<leader>f", function()
@@ -176,5 +226,32 @@ vim.keymap.set("n", "<leader>e", ":Oil<CR>", { desc = "Open File [E]xplorer" })
 vim.keymap.set("n", "<leader>sf", ":Pick files<CR>", { desc = "[S]earch [f]iles" })
 vim.keymap.set("n", "<leader>sg", ":Pick grep_live<CR>", { desc = "[S]earch [G]rep" })
 vim.keymap.set("n", "<leader><leader>", ":Pick buffers<CR>", { desc = "[S]earch [b]uffer" })
+vim.keymap.set("n", "<leader>d", ":bd<CR>", { desc = "[D]elete Buffer" })
+
+require("flash").setup({
+	-- ENABLING WHOLE-DOCUMENT SEARCH (across windows)
+	search = {
+		multi_window = true, -- This allows searching across ALL windows, not just forward/backward in one.
+		wrap = true, -- Wraps around the end/beginning of the document
+	},
+	-- (Optional) ENABLING JUMP LABELS FOR F/T MOTIONS
+	-- This adds flash labels to standard f, F, t, T character motions.
+	modes = { char = { jump_labels = true } },
+})
+
+-- Set up keybindings for flash.nvim
+vim.keymap.set({ "n", "x", "o" }, "s", function()
+	require("flash").jump()
+end, { desc = "Flash jump (search across windows)" })
+
+vim.keymap.set({ "n", "x", "o" }, "S", function()
+	require("flash").treesitter()
+end, { desc = "Flash Treesitter" })
+
+-- REMOTE ACTION (highly useful for operating on text elsewhere)
+-- This lets you yank/delete/change text in a different part of the file and return.
+vim.keymap.set("o", "r", function()
+	require("flash").remote()
+end, { desc = "Remote Flash (operate at a distance)" })
 
 vim.cmd("colorscheme catppuccin")

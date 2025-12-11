@@ -35,17 +35,19 @@ git pull || true # ignore when the pull doesnt work due to local changes
 # Edit your config
 $EDITOR ~/.dotfiles/NixOs/configuration.nix
 
-
 # Early return if no changes were detected (thanks @singiamtel!)
-if git diff --quiet ; then
-    echo "No changes detected, exiting."
-    popd
-    exit 0
+if git diff --quiet; then
+  echo "No changes detected, exiting."
+  popd
+  exit 0
 fi
 
 # Autoformat your nix files
-alejandra . &>/dev/null \
-  || ( alejandra . ; echo "formatting failed!" && exit 1)
+alejandra . &>/dev/null ||
+  (
+    alejandra .
+    echo "formatting failed!" && exit 1
+  )
 
 # Shows your changes
 git diff -U0
@@ -54,7 +56,8 @@ config_file=$(pwd)/configuration.nix
 echo "NixOS Rebuilding... using file: $config_file"
 
 # Rebuild, output simplified errors, log trackebacks
-sudo nixos-rebuild switch -I nixos-config=$config_file --upgrade --use-substitutes
+nix flake update
+sudo nixos-rebuild switch -I nixos-config=$config_file --flake '.#linus-x1' --upgrade --use-substitutes --impure
 
 # Get current generation metadata
 current=$(nixos-rebuild list-generations | grep current)
