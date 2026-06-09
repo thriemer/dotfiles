@@ -122,21 +122,24 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-tree/nvim-web-devicons" }, -- nice icons
 	{ src = "https://github.com/nvim-lualine/lualine.nvim" }, -- nicer status line
 	{ src = "https://github.com/folke/which-key.nvim" }, -- Key help
+	{ src = "https://github.com/lewis6991/gitsigns.nvim" }, -- Git line status
 	-- misc until now
 	{ src = "https://github.com/stevearc/oil.nvim" }, -- File explorer
 	{ src = "https://github.com/neovim/nvim-lspconfig" }, -- LSP
-	{ src = "https://github.com/echasnovski/mini.nvim" },
+	{ src = "https://github.com/echasnovski/mini.nvim", name = "mini" },
 	{ src = "https://github.com/stevearc/conform.nvim" }, -- formatting
-	{ src = "https://github.com/chomosuke/typst-preview.nvim" }, -- typst file editing
 	{ src = "https://github.com/Saecki/crates.nvim" }, -- rust cargo toml support
 	{ src = "https://github.com/folke/flash.nvim" },
+	-- writing academical
+	{ src = "https://github.com/chomosuke/typst-preview.nvim" }, -- typst file editing
 	-- completion
 	{ src = "https://github.com/hrsh7th/nvim-cmp" }, -- The completion engine
 	{ src = "https://github.com/hrsh7th/cmp-nvim-lsp" }, -- LSP as a completion source
 	{ src = "https://github.com/hrsh7th/cmp-buffer" }, -- Suggests words from open buffers
 	{ src = "https://github.com/hrsh7th/cmp-path" }, -- Suggests file system paths
-	{ src = "https://github.com/L3MON4D3/LuaSnip" }, -- Snippet engine (optional but recommended)
+	{ src = "https://github.com/L3MON4D3/LuaSnip", name = "luasnip" }, -- Snippet engine (optional but recommended)
 	{ src = "https://github.com/saadparwaiz1/cmp_luasnip" }, -- Snippets as a completion source
+	{ src = "https://github.com/jake-stewart/multicursor.nvim" },
 })
 
 vim.lsp.enable({
@@ -145,6 +148,8 @@ vim.lsp.enable({
 	"nil_ls",
 	"tinymist",
 	"basedpyright",
+	"harper_ls",
+	"vtsls",
 })
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -152,6 +157,60 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
 		client.server_capabilities = vim.tbl_deep_extend("force", client.server_capabilities, capabilities)
+		-- LSP keymaps
+		local opts = { buffer = ev.buf }
+		vim.keymap.set(
+			"n",
+			"gd",
+			vim.lsp.buf.definition,
+			vim.tbl_extend("force", opts, { desc = "[G]oto [D]efinition" })
+		)
+
+		vim.keymap.set(
+			"n",
+			"gD",
+			vim.lsp.buf.declaration,
+			vim.tbl_extend("force", opts, { desc = "Go to [D]eclaration" })
+		)
+
+		vim.keymap.set(
+			"n",
+			"gi",
+			vim.lsp.buf.implementation,
+			vim.tbl_extend("force", opts, { desc = "Go to [I]mplementation" })
+		)
+
+		vim.keymap.set("n", "gr", vim.lsp.buf.references, vim.tbl_extend("force", opts, { desc = "Show [R]eferences" }))
+
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover documentation" }))
+
+		vim.keymap.set(
+			"n",
+			"<leader>rn",
+			vim.lsp.buf.rename,
+			vim.tbl_extend("force", opts, { desc = "[R]e[n]ame symbol" })
+		)
+
+		vim.keymap.set(
+			"n",
+			"<leader>ca",
+			vim.lsp.buf.code_action,
+			vim.tbl_extend("force", opts, { desc = "[C]ode [A]ction" })
+		)
+
+		vim.keymap.set(
+			"n",
+			"<leader>dp",
+			vim.diagnostic.goto_prev,
+			vim.tbl_extend("force", opts, { desc = "Previous diagnostic" })
+		)
+
+		vim.keymap.set(
+			"n",
+			"<leader>dn",
+			vim.diagnostic.goto_next,
+			vim.tbl_extend("force", opts, { desc = "Next diagnostic" })
+		)
 	end,
 })
 
@@ -161,27 +220,61 @@ require("oil").setup()
 require("crates").setup()
 require("smear_cursor").setup()
 require("mini.pick").setup()
-require("which-key").setup()
+require("which-key").add({
+	{ "<leader>s", group = "Search" },
+	{ "<leader>c", group = "Code" },
+	{ "<leader>d", group = "Diagnostic" },
+	{ "<leader>h", group = "Hunk (Git)" },
+	--	{">leader>
+})
+require("gitsigns").setup({
+	on_attach = function(bufnr)
+		local gitsigns = require("gitsigns")
+		local function map(mode, l, r, opts)
+			opts = opts or {}
+			opts.buffer = bufnr
+			vim.keymap.set(mode, l, r, opts)
+		end
+		map("n", "<leader>hs", gitsigns.preview_hunk, { desc = "[h]unk [s]how" })
+		map("n", "<leader>hi", gitsigns.preview_hunk_inline, { desc = "[h]unk peview [i]nline" })
+		map("n", "<leader>hn", function()
+			gitsigns.nav_hunk("next")
+		end, { desc = "[h]unk [n]ext" })
+		map("n", "<leader>hp", function()
+			gitsigns.nav_hunk("prev")
+		end, { desc = "[h]unk [p]rev" })
+
+		map("n", "<leader>hb", function()
+			gitsigns.blame_line({ full = true })
+		end, { desc = "[h]unk [b]lame" })
+	end,
+})
 require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
 		javascript = { "prettierd" },
+		javascriptreact = { "prettierd" },
+		typescriptreact = { "prettierd" },
 		css = { "prettierd" },
 		markdown = { "prettierd" },
 		nix = { "alejandra" },
 		xml = { "xmlformat" },
 		html = { "prettierd" },
 		json = { "prettierd" },
+		jsonc = { "prettierd" },
 		yaml = { "prettierd" },
 		rust = { "rustfmt", lsp_format = "fallback" },
 		sh = { "shfmt" },
 		python = { "ruff" },
-		typst = { "typstfmt" },
+		typst = { "typstyle" },
 	},
 	-- Customize formatters
 	formatters = {
 		shfmt = {
 			prepend_args = { "-i", "2" },
+		},
+		typstyle = {
+			append_args = { "--wrap-text" },
 		},
 	},
 })
@@ -225,8 +318,7 @@ vim.keymap.set("n", "<leader>e", ":Oil<CR>", { desc = "Open File [E]xplorer" })
 
 vim.keymap.set("n", "<leader>sf", ":Pick files<CR>", { desc = "[S]earch [f]iles" })
 vim.keymap.set("n", "<leader>sg", ":Pick grep_live<CR>", { desc = "[S]earch [G]rep" })
-vim.keymap.set("n", "<leader><leader>", ":Pick buffers<CR>", { desc = "[S]earch [b]uffer" })
-vim.keymap.set("n", "<leader>d", ":bd<CR>", { desc = "[D]elete Buffer" })
+vim.keymap.set("n", "<leader>sb", ":Pick buffers<CR>", { desc = "[S]earch [b]uffer" })
 
 require("flash").setup({
 	-- ENABLING WHOLE-DOCUMENT SEARCH (across windows)
@@ -238,6 +330,62 @@ require("flash").setup({
 	-- This adds flash labels to standard f, F, t, T character motions.
 	modes = { char = { jump_labels = true } },
 })
+
+require("typst-preview").setup({
+	dependencies_bin = {
+		tinymist = "/run/current-system/sw/bin/tinymist",
+	},
+})
+
+local mc = require("multicursor-nvim")
+mc.setup()
+
+local set = vim.keymap.set
+
+-- Add or skip cursor above/below the main cursor.
+set({ "n", "x" }, "<up>", function()
+	mc.lineAddCursor(-1)
+end)
+set({ "n", "x" }, "<down>", function()
+	mc.lineAddCursor(1)
+end)
+-- Add and remove cursors with control + left click.
+set("n", "<c-leftmouse>", mc.handleMouse)
+set("n", "<c-leftdrag>", mc.handleMouseDrag)
+set("n", "<c-leftrelease>", mc.handleMouseRelease)
+
+-- Disable and enable cursors.
+set({ "n", "x" }, "<c-q>", mc.toggleCursor)
+
+-- Mappings defined in a keymap layer only apply when there are
+-- multiple cursors. This lets you have overlapping mappings.
+mc.addKeymapLayer(function(layerSet)
+	-- Select a different cursor as the main one.
+	layerSet({ "n", "x" }, "<left>", mc.prevCursor)
+	layerSet({ "n", "x" }, "<right>", mc.nextCursor)
+
+	-- Delete the main cursor.
+	layerSet({ "n", "x" }, "<leader>x", mc.deleteCursor)
+
+	-- Enable and clear cursors using escape.
+	layerSet("n", "<esc>", function()
+		if not mc.cursorsEnabled() then
+			mc.enableCursors()
+		else
+			mc.clearCursors()
+		end
+	end)
+end)
+
+-- Customize how cursors look.
+local hl = vim.api.nvim_set_hl
+hl(0, "MultiCursorCursor", { reverse = true })
+hl(0, "MultiCursorVisual", { link = "Visual" })
+hl(0, "MultiCursorSign", { link = "SignColumn" })
+hl(0, "MultiCursorMatchPreview", { link = "Search" })
+hl(0, "MultiCursorDisabledCursor", { reverse = true })
+hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
+hl(0, "MultiCursorDisabledSign", { link = "SignColumn" })
 
 -- Set up keybindings for flash.nvim
 vim.keymap.set({ "n", "x", "o" }, "s", function()

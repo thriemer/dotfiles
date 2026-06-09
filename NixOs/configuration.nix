@@ -5,7 +5,7 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan..
+    # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
 
@@ -24,19 +24,11 @@
     };
   };
 
-  nixpkgs = {
-    config = {
-      permittedInsecurePackages = [
-        "openssl-1.1.1w"
-      ];
-    };
-  };
-
   # Bootloader.
   boot = {
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
-    supportedFilesystems = ["ntfs"];
+    supportedFilesystems = ["ntfs" "nfs"];
     initrd.kernelModules = [
       "nvidia"
       "evdi"
@@ -50,6 +42,13 @@
 
   networking.hostName = "linus-x1"; # Define your hostname.
 
+  nixpkgs = {
+    config.allowUnfree = true;
+    overlays = [
+      inputs.llama-cpp.overlays.default
+    ];
+  };
+
   # Enable networking
   networking = {
     networkmanager = {
@@ -59,8 +58,8 @@
         pkgs.networkmanager-openvpn
         pkgs.networkmanager-vpnc
         pkgs.networkmanager-l2tp
+        pkgs.networkmanager-strongswan
       ];
-      enableStrongSwan = true;
     };
     wireguard.enable = true;
     firewall.enable = false; # so that the wireguard vpn works
@@ -103,6 +102,7 @@
   };
 
   services = {
+    desktopManager.plasma6.enable = true;
     displayManager = {
       defaultSession = "hyprland-uwsm";
       sddm.enable = true;
@@ -120,17 +120,18 @@
         variant = "";
       };
     };
-    printing.enable = true;
+    printing = {
+      enable = true;
+      drivers = with pkgs; [
+        cups-filters
+        cups-browsed
+      ];
+    };
     envfs.enable = true; # enable bash for scripts that assume hard coded shebang
     gvfs.enable = true;
     udisks2.enable = true;
     blueman.enable = true;
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
+    tailscale.enable = true;
     openssh = {
       enable = true;
       settings.PasswordAuthentication = false;
@@ -145,7 +146,6 @@
     setSocketVariable = true;
   };
 
-  security.rtkit.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
     mutableUsers = true;
@@ -153,14 +153,18 @@
       isNormalUser = true;
       description = "Linus";
       extraGroups = [
+        "docker"
         "dialout"
         "networkmanager"
         "wheel"
         "netdev"
+        "audio"
       ];
       packages = with pkgs; [
         slack
         mattermost
+        onlyoffice-desktopeditors
+        claude-code
         kubectl
         kubelogin
         zoom-us
@@ -181,10 +185,12 @@
       home = "/home/private";
       description = "Private Linus";
       extraGroups = [
+        "docker"
         "dialout"
         "wheel"
         "networkmanager"
         "netdev"
+        "audio"
       ];
       packages = with pkgs; [
         zathura
@@ -192,14 +198,24 @@
         anki-bin
         kdePackages.kdenlive
         signal-desktop
+        gnucash
         # inkscape
         # visualvm
       ];
     };
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  fileSystems."/media/financialdata" = {
+    device = "raspberrypi.bangus-firefighter.ts.net:/financedata";
+    fsType = "nfs";
+    options = [
+      "users"
+      "nfsvers=4.2" # Enforce NFSv4.2
+      "noauto" # Do not mount at boot (optional)
+      "x-systemd.automount" # Mount on-demand
+      "x-systemd.idle-timeout=60"
+    ];
+  };
 
   system = {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
@@ -233,7 +249,7 @@
       hyprlock
       hypridle
       playerctl
-      pavucontrol
+      pwvucontrol
       brightnessctl
       wlogout
       copyq
@@ -245,10 +261,10 @@
       # Development
       gcc
       git
-      jetbrains.idea-ultimate
-      temurin-bin-24
+      jetbrains.idea
+      temurin-bin
       jetbrains.rust-rover
-      jetbrains.pycharm-professional
+      jetbrains.pycharm
       uv
       unzip
       gzip
@@ -267,6 +283,8 @@
       tmux
       lazygit
       ydotool
+      cifs-utils
+      (pkgs.llama-cpp.override {useCuda = true;})
 
       # Vim
       # language servers
@@ -274,11 +292,14 @@
       rust-analyzer
       nil
       basedpyright
+      vtsls
 
       # Uni
       typst
-      typstfmt
+      typstyle
       tinymist
+      harper # grammar and spell checking ls
+      texliveFull
 
       # formatters
       rustfmt
@@ -289,7 +310,7 @@
       shfmt
 
       # insta 360
-      wineWowPackages.stable
+      wineWow64Packages.stable
       bottles
       gnupg
     ];
@@ -301,15 +322,15 @@
   ];
 
   programs = {
+    direnv.enable = true;
     neovim = {
       enable = true;
       defaultEditor = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+      package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
     };
     nix-ld = {
       enable = true;
       libraries = with pkgs; [
-        openssl_1_1 # Provides libcrypto.so.1.1 and libssl.so.1.1
         curl # Provides libcurl.so.4
         xz # Provides liblzma.so.5
         # Include common dependencies to prevent future issues

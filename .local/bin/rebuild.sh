@@ -60,7 +60,7 @@ nix flake update
 sudo nixos-rebuild switch -I nixos-config=$config_file --flake '.#linus-x1' --upgrade --use-substitutes --impure
 
 # Get current generation metadata
-current=$(nixos-rebuild list-generations | grep current)
+current=$(nixos-rebuild list-generations | grep current || echo "Config changes")
 # Commit all changes witih the generation metadata
 git commit -am "$current"
 git push
