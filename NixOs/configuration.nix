@@ -5,7 +5,7 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
+    # Include the results of the hardware scan
     ./hardware-configuration.nix
   ];
 
@@ -284,7 +284,7 @@
       lazygit
       ydotool
       cifs-utils
-      (pkgs.llama-cpp.override {useCuda = true;})
+      #(pkgs.llama-cpp.override {useCuda = true;})
 
       # Vim
       # language servers
