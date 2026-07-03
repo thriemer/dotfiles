@@ -81,6 +81,12 @@
     LC_TIME = "de_DE.UTF-8";
   };
 
+  zramSwap = {
+    enable = true;
+    priority = 100;
+    memoryPercent = 100;
+  };
+
   # Enable OpenGL
   hardware = {
     graphics = {
