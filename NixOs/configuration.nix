@@ -267,6 +267,7 @@
       # Development
       gcc
       git
+      git-credential-manager
       jetbrains.idea
       temurin-bin
       jetbrains.rust-rover
