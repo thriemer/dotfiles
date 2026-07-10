@@ -155,6 +155,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
     mutableUsers = true;
+    defaultUserShell = pkgs.zsh;
     users.work = {
       isNormalUser = true;
       description = "Linus";
@@ -353,7 +354,7 @@
       withUWSM = true;
       xwayland.enable = true;
     };
-    fish.enable = true;
+    zsh.enable = true;
     ssh.startAgent = true; # remeber private keys so that i dont have to type them in again
     appimage = {
       enable = true;
