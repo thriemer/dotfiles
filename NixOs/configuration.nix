@@ -108,7 +108,6 @@
   };
 
   services = {
-    desktopManager.plasma6.enable = true;
     displayManager = {
       defaultSession = "hyprland-uwsm";
       sddm.enable = true;
@@ -177,7 +176,7 @@
         zoom-us
         graphviz
         databricks-cli
-        awscli
+        awscli2
         poetry
         mongodb-compass
         (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
