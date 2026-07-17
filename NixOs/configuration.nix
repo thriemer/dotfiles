@@ -108,7 +108,7 @@
   };
 
   services = {
-    passSecretService.enable = true; # equivalent to gnome keyring
+    gnome.gnome-keyring.enable = true; # equivalent to gnome keyring
     displayManager = {
       defaultSession = "hyprland-uwsm";
       sddm.enable = true;
@@ -355,7 +355,6 @@
       xwayland.enable = true;
     };
     zsh.enable = true;
-    ssh.startAgent = true; # remeber private keys so that i dont have to type them in again
     appimage = {
       enable = true;
       binfmt = true;
