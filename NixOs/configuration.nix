@@ -108,6 +108,7 @@
   };
 
   services = {
+    passSecretService.enable = true; # equivalent to gnome keyring
     displayManager = {
       defaultSession = "hyprland-uwsm";
       sddm.enable = true;
