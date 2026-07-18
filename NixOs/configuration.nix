@@ -44,9 +44,11 @@
 
   nixpkgs = {
     config.allowUnfree = true;
-    overlays = [
+    /*
+      overlays = [
       inputs.llama-cpp.overlays.default
     ];
+    */
   };
 
   # Enable networking
@@ -334,7 +336,7 @@
     neovim = {
       enable = true;
       defaultEditor = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      #  package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
     };
     nix-ld = {
       enable = true;
