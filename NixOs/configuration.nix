@@ -226,6 +226,18 @@
     ];
   };
 
+  fileSystems."/media/backup" = {
+    device = "raspberrypi.bangus-firefighter.ts.net:/backup";
+    fsType = "nfs";
+    options = [
+      "users"
+      "nfsvers=4.2" # Enforce NFSv4.2
+      "noauto" # Do not mount at boot (optional)
+      "x-systemd.automount" # Mount on-demand
+      "x-systemd.idle-timeout=60"
+    ];
+  };
+
   system = {
     copySystemConfiguration = true; # copies that generations config to /run/current-system/configuration.nix
   };
