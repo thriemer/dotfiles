@@ -28,7 +28,6 @@ local menu        = "wofi --show run"
 hl.on("hyprland.start", function()
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("blueman-applet")
-    hl.exec_cmd("dunst")
     hl.exec_cmd("swaync")
     hl.exec_cmd("waybar")
     hl.exec_cmd("hypridle")

@@ -253,7 +253,6 @@
       kitty
       waybar
       networkmanagerapplet
-      dunst
       swaynotificationcenter
       hyprpaper
       hyprlock
