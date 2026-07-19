@@ -254,6 +254,7 @@
       waybar
       networkmanagerapplet
       dunst
+      swaynotificationcenter
       hyprpaper
       hyprlock
       hypridle
