@@ -16,8 +16,11 @@
 # Usage:
 #   agent.sh                       # claude-code in $PWD
 #   agent.sh -a opencode           # opencode in $PWD
+#   agent.sh -a pi                 # pi in $PWD
 #   agent.sh -- --resume           # pass everything after -- to the agent CLI
 #   agent.sh -a opencode -- run "fix the build"
+#   agent.sh -c "make test"        # run a command in the sandbox instead
+#                                 #   (env/direnv + agent provisioned; -- passthrough is ignored)
 #
 # Override the committer email with AGENT_GIT_EMAIL.
 set -euo pipefail
@@ -33,10 +36,19 @@ GIT_EMAIL="${AGENT_GIT_EMAIL:-linus.thriemer@pentacor.de}"
 # --- args -----------------------------------------------------------------
 agent="claude"
 PASSTHROUGH=()
+EXEC_CMD=""
 while [ $# -gt 0 ]; do
   case "$1" in
     -a | --agent)
       agent="${2:-}"
+      shift 2
+      ;;
+    -c | --cmd)
+      EXEC_CMD="${2:-}"
+      if [ -z "$EXEC_CMD" ]; then
+        echo "agent.sh: --cmd requires a command string" >&2
+        exit 2
+      fi
       shift 2
       ;;
     --)
@@ -84,8 +96,15 @@ case "$agent" in
       CRED_MOUNTS+=(-v "$HOME/.config/opencode/opencode.jsonc:/root/.config/opencode/opencode.jsonc:ro")
     fi
     ;;
+  pi)
+    need_file "$HOME/.pi/agent/auth.json"
+    # Whole ~/.pi dir: auth + settings + trust + sessions + packages, plus the
+    # ~/.pi-root files pi-free writes (free.json keys, provider-cache.json).
+    # Mirrors the claude ~/.claude.json trade — persistent state, prompt-free start.
+    CRED_MOUNTS+=(-v "$HOME/.pi:/root/.pi")
+    ;;
   *)
-    echo "agent.sh: unknown agent '$agent' (expected 'claude' or 'opencode')" >&2
+    echo "agent.sh: unknown agent '$agent' (expected 'claude', 'opencode', or 'pi')" >&2
     exit 2
     ;;
 esac
@@ -102,7 +121,19 @@ docker volume create "$STORE_VOL" >/dev/null
 docker volume create "$CACHE_VOL" >/dev/null
 
 # --- run ------------------------------------------------------------------
-exec docker run --rm -it \
+# In --cmd mode we drop -t when stdin isn't a tty (pipelines/CI) so the command
+# doesn't die with "the input device is not a TTY".
+TTY_FLAGS=(-it)
+if [ -n "$EXEC_CMD" ] && [ ! -t 0 ]; then
+  TTY_FLAGS=(-i)
+fi
+
+EXEC_ENV=()
+if [ -n "$EXEC_CMD" ]; then
+  EXEC_ENV+=(-e "EXEC_CMD=$EXEC_CMD")
+fi
+
+exec docker run --rm "${TTY_FLAGS[@]}" \
   --security-opt=no-new-privileges \
   `# --cap-drop=ALL   # deferred; safe to enable (image has sandbox=false), left off for the first cut` \
   -v "$STORE_VOL":/nix \
@@ -114,6 +145,7 @@ exec docker run --rm -it \
   -e AGENT="$agent" \
   -e GIT_NAME="$GIT_NAME" \
   -e GIT_EMAIL="$GIT_EMAIL" \
+  "${EXEC_ENV[@]}" \
   --entrypoint /agent-entrypoint.sh \
   "$IMAGE" \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
