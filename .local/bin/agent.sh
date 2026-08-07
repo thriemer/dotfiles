@@ -17,7 +17,8 @@
 #   agent.sh                       # claude-code in $PWD
 #   agent.sh -a opencode           # opencode in $PWD
 #   agent.sh -a pi                 # pi in $PWD
-#   agent.sh -- --resume           # pass everything after -- to the agent CLI
+#   agent.sh -d /path             # read-only-mount host path at the same path in-container
+#   agent.sh -- --resume 5        # pass everything after -- to the agent CLI
 #   agent.sh -a opencode -- run "fix the build"
 #   agent.sh -c "make test"        # run a command in the sandbox instead
 #                                 #   (env/direnv + agent provisioned; -- passthrough is ignored)
@@ -37,6 +38,7 @@ GIT_EMAIL="${AGENT_GIT_EMAIL:-linus.thriemer@pentacor.de}"
 agent="claude"
 PASSTHROUGH=()
 EXEC_CMD=""
+DATA_MOUNTS=()
 while [ $# -gt 0 ]; do
   case "$1" in
     -a | --agent)
@@ -49,6 +51,10 @@ while [ $# -gt 0 ]; do
         echo "agent.sh: --cmd requires a command string" >&2
         exit 2
       fi
+      shift 2
+      ;;
+    -d | --data)
+      DATA_MOUNTS+=(-v "${2}:${2}:ro")
       shift 2
       ;;
     --)
@@ -140,6 +146,7 @@ exec docker run --rm "${TTY_FLAGS[@]}" \
   -v "$CACHE_VOL":/root/.cache/nix \
   -v "$PWD":/workspace \
   -w /workspace \
+  "${DATA_MOUNTS[@]}" \
   -v "$ENTRYPOINT":/agent-entrypoint.sh:ro \
   "${CRED_MOUNTS[@]}" \
   -e AGENT="$agent" \
