@@ -44,11 +44,10 @@
 
   nixpkgs = {
     config.allowUnfree = true;
-    /*
-      overlays = [
+
+    overlays = [
       inputs.llama-cpp.overlays.default
     ];
-    */
   };
 
   # Enable networking
@@ -181,10 +180,10 @@
         databricks-cli
         awscli2
         poetry
-        mongodb-compass
-        (pkgs.callPackage /home/work/software/idp/idpcli.nix {})
-        (pkgs.callPackage /home/work/software/insomnium.nix {})
-        (pkgs.callPackage /home/work/software/freelens.nix {})
+        #mongodb-compass
+        #(pkgs.callPackage /home/work/software/idp/idpcli.nix {})
+        #(pkgs.callPackage /home/work/software/insomnium.nix {})
+        #(pkgs.callPackage /home/work/software/freelens.nix {})
       ];
     };
 
@@ -286,7 +285,7 @@
       jetbrains.idea
       temurin-bin
       jetbrains.rust-rover
-      jetbrains.pycharm
+      #jetbrains.pycharm
       uv
       unzip
       gzip
@@ -306,7 +305,7 @@
       lazygit
       ydotool
       cifs-utils
-      #(pkgs.llama-cpp.override {useCuda = true;})
+      (pkgs.llama-cpp.override {useCuda = true;})
 
       # Vim
       # language servers
