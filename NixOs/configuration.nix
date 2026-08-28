@@ -284,6 +284,8 @@
 
       # Development
       bubblewrap
+      claude-code
+      pi-coding-agent
       gcc
       git
       git-credential-manager
