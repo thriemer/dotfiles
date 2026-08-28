@@ -286,6 +286,7 @@
       bubblewrap
       claude-code
       pi-coding-agent
+      nodejs
       gcc
       git
       git-credential-manager
@@ -312,7 +313,7 @@
       lazygit
       ydotool
       cifs-utils
-      (pkgs.llama-cpp.override {useCuda = true;})
+      #(pkgs.llama-cpp.override {useCuda = true;})
 
       # Vim
       # language servers
