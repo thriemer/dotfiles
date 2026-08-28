@@ -283,6 +283,7 @@
       grim
 
       # Development
+      bubblewrap
       gcc
       git
       git-credential-manager
