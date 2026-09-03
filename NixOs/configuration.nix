@@ -3,7 +3,12 @@
   pkgs,
   inputs,
   ...
-}: {
+}: let
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -285,8 +290,9 @@
       # Development
       bubblewrap
       claude-code
-      pi-coding-agent
+      pkgs-unstable.pi-coding-agent
       nodejs
+      python3
       gcc
       git
       git-credential-manager

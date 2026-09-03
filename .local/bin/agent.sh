@@ -23,7 +23,8 @@
 #   agent.sh                      # claude-code in $PWD
 #   agent.sh -a opencode          # opencode in $PWD
 #   agent.sh -a pi                # pi in $PWD
-#   agent.sh -d /path             # read-only-bind host path at the same path
+#   agent.sh -ro /path            # read-only-bind host path at the same path
+#   agent.sh -rw /path            # read-write-bind host path at the same path
 #   agent.sh -- --resume 5        # pass everything after -- to the agent CLI
 #   agent.sh -c "make test"       # run a command in the sandbox instead
 #
@@ -68,9 +69,14 @@ while [ $# -gt 0 ]; do
       [ -n "$EXEC_CMD" ] || die "--cmd requires a command string"
       shift 2
       ;;
-    -d | --data)
-      [ -e "${2:-}" ] || die "--data path '${2:-}' does not exist"
+    -ro | --ro)
+      [ -e "${2:-}" ] || die "--ro path '${2:-}' does not exist"
       DATA_BINDS+=(--ro-bind "$2" "$2")
+      shift 2
+      ;;
+    -rw | --rw)
+      [ -e "${2:-}" ] || die "--rw path '${2:-}' does not exist"
+      DATA_BINDS+=(--bind "$2" "$2")
       shift 2
       ;;
     --)
