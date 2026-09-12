@@ -7,6 +7,9 @@
   pkgs-unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs) system;
     config.allowUnfree = true;
+    overlays = [
+      inputs.llama-cpp.overlays.default
+    ];
   };
 in {
   imports = [
@@ -51,13 +54,7 @@ in {
 
   networking.hostName = "linus-x1"; # Define your hostname.
 
-  nixpkgs = {
-    config.allowUnfree = true;
-
-    overlays = [
-      inputs.llama-cpp.overlays.default
-    ];
-  };
+  nixpkgs.config.allowUnfree = true;
 
   # Enable networking
   networking = {
@@ -319,7 +316,7 @@ in {
       lazygit
       ydotool
       cifs-utils
-      #(pkgs.llama-cpp.override {useCuda = true;})
+      (pkgs-unstable.llama-cpp.override {useCuda = true;})
 
       # Vim
       # language servers
