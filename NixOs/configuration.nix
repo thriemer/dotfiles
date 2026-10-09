@@ -7,13 +7,10 @@
   pkgs-unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs) system;
     config.allowUnfree = true;
-    overlays = [
-      inputs.llama-cpp.overlays.default
-    ];
   };
 in {
   imports = [
-    # Include the results of the hardware scan..
+    # Include the results of the hardware scan
     ./hardware-configuration.nix
   ];
 
@@ -63,7 +60,6 @@ in {
       plugins = [
         pkgs.networkmanager-openconnect
         pkgs.networkmanager-openvpn
-        pkgs.networkmanager-vpnc
         pkgs.networkmanager-l2tp
         pkgs.networkmanager-strongswan
       ];
@@ -178,7 +174,6 @@ in {
         slack
         mattermost
         onlyoffice-desktopeditors
-        claude-code
         kubectl
         kubelogin
         zoom-us
@@ -286,7 +281,7 @@ in {
 
       # Development
       bubblewrap
-      claude-code
+      pkgs-unstable.claude-code
       pkgs-unstable.pi-coding-agent
       nodejs
       python3
@@ -316,7 +311,6 @@ in {
       lazygit
       ydotool
       cifs-utils
-      (pkgs-unstable.llama-cpp.override {useCuda = true;})
 
       # Vim
       # language servers

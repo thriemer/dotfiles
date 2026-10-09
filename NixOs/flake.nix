@@ -5,7 +5,6 @@
     nixpkgs.url = "nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-    llama-cpp.url = "github:ggml-org/llama.cpp";
   };
 
   outputs = {
