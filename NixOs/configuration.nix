@@ -145,6 +145,55 @@ in {
       enable = true;
       settings.PasswordAuthentication = false;
     };
+    syncthing = {
+      enable = true;
+      user = "private";
+      group = "users";
+      configDir = "/home/private/.config/syncthing";
+      databaseDir = "/home/private/.local/state/syncthing";
+      openDefaultPorts = true;
+      overrideDevices = false; # devices are paired via the web ui
+      overrideFolders = false;
+      settings.folders."activitywatch" = {
+        id = "activitywatch";
+        path = "/home/private/.local/share/activitywatch/sync";
+      };
+    };
+  };
+
+  systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # don't create ~/Sync
+
+  # ActivityWatch for user private
+  systemd.user.services = let
+    awService = description: execStart: extra:
+      {
+        inherit description;
+        unitConfig.ConditionUser = "private";
+        wantedBy = ["graphical-session.target"];
+        partOf = ["graphical-session.target"];
+        after = ["graphical-session.target"];
+        serviceConfig = {
+          ExecStart = execStart;
+          Restart = "on-failure";
+          RestartSec = 5;
+        };
+      }
+      // extra;
+    afterServer = {
+      after = ["graphical-session.target" "activitywatch-server.service"];
+      requires = ["activitywatch-server.service"];
+    };
+  in {
+    activitywatch-server =
+      awService "ActivityWatch server" "${pkgs.aw-server-rust}/bin/aw-server" {};
+    activitywatch-watcher =
+      awService "ActivityWatch window and afk watcher" "${pkgs.awatcher}/bin/awatcher" afterServer;
+    activitywatch-sync =
+      awService "ActivityWatch sync" "${pkgs.aw-server-rust}/bin/aw-sync daemon"
+      (afterServer
+        // {
+          environment.AW_SYNC_DIR = "/home/private/.local/share/activitywatch/sync";
+        });
   };
 
   # Configure console keymap
@@ -208,6 +257,8 @@ in {
         kdePackages.kdenlive
         signal-desktop
         gnucash
+        aw-server-rust # activitywatch server + aw-sync
+        awatcher # wayland window and afk watcher for activitywatch
         # inkscape
         # visualvm
       ];
