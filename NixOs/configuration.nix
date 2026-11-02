@@ -158,9 +158,11 @@ in {
         id = "A4QATJD-XX4FM6V-A4UAVZ6-KKBXIWQ-34IR5XI-ACHJDOA-6GDU5RF-OFGRAAH";
         addresses = ["tcp://raspberrypi.bangus-firefighter.ts.net:22000"];
       };
-      settings.folders."activitywatch" = {
-        id = "activitywatch";
-        path = "/home/private/.local/share/activitywatch/sync";
+      # one folder per device, so devices only push to the pi and never sync with each other
+      settings.folders."activitywatch-${config.networking.hostName}" = {
+        id = "activitywatch-${config.networking.hostName}";
+        path = "/home/private/.local/share/activitywatch/sync/${config.networking.hostName}";
+        type = "sendonly";
         devices = ["raspberrypi"];
       };
     };
@@ -382,7 +384,7 @@ in {
       gcc
       git
       git-credential-manager
-      jetbrains.idea
+      # jetbrains.idea
       temurin-bin
       jetbrains.rust-rover
       #jetbrains.pycharm
