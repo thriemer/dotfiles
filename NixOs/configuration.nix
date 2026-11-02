@@ -154,9 +154,14 @@ in {
       openDefaultPorts = true;
       overrideDevices = false; # devices are paired via the web ui
       overrideFolders = false;
+      settings.devices."raspberrypi" = {
+        id = "A4QATJD-XX4FM6V-A4UAVZ6-KKBXIWQ-34IR5XI-ACHJDOA-6GDU5RF-OFGRAAH";
+        addresses = ["tcp://raspberrypi.bangus-firefighter.ts.net:22000"];
+      };
       settings.folders."activitywatch" = {
         id = "activitywatch";
         path = "/home/private/.local/share/activitywatch/sync";
+        devices = ["raspberrypi"];
       };
     };
   };
@@ -164,7 +169,30 @@ in {
   systemd.services.syncthing.environment.STNODEFAULTFOLDER = "true"; # don't create ~/Sync
 
   # ActivityWatch for user private
-  systemd.user.services = let
+  systemd.user = let
+    awSyncDir = "/home/private/.local/share/activitywatch/sync";
+    # aw-sync daemon only syncs window and afk buckets, this syncs all of them
+    awSync = pkgs.writeShellApplication {
+      name = "aw-sync-all";
+      runtimeInputs = with pkgs; [aw-server-rust curl jq coreutils];
+      text = ''
+        shopt -s nullglob
+        root="$AW_SYNC_DIR"
+        api="http://127.0.0.1:5600/api/0"
+        host=$(curl -fsS "$api/info" | jq -r .hostname)
+
+        # pull from other hosts, layout is <root>/<host>/<device-id>/*.db
+        for dir in "$root"/*/; do
+          h=$(basename "$dir")
+          [ "$h" = "$host" ] && continue
+          aw-sync --sync-dir "''${dir%/}" sync-advanced --mode pull || echo "pull from $h failed" >&2
+        done
+
+        # push all own buckets, skip the ones imported from other hosts
+        buckets=$(curl -fsS "$api/buckets/" | jq -r 'keys | map(select(contains("-synced-from-") | not)) | join(",")')
+        aw-sync --sync-dir "$root/$host" sync-advanced --mode push --buckets "$buckets"
+      '';
+    };
     awService = description: execStart: extra:
       {
         inherit description;
@@ -184,16 +212,32 @@ in {
       requires = ["activitywatch-server.service"];
     };
   in {
-    activitywatch-server =
-      awService "ActivityWatch server" "${pkgs.aw-server-rust}/bin/aw-server" {};
-    activitywatch-watcher =
-      awService "ActivityWatch window and afk watcher" "${pkgs.awatcher}/bin/awatcher" afterServer;
-    activitywatch-sync =
-      awService "ActivityWatch sync" "${pkgs.aw-server-rust}/bin/aw-sync daemon"
-      (afterServer
-        // {
-          environment.AW_SYNC_DIR = "/home/private/.local/share/activitywatch/sync";
-        });
+    services = {
+      activitywatch-server =
+        awService "ActivityWatch server" "${pkgs.aw-server-rust}/bin/aw-server" {};
+      # awatcher tracks windows and afk on hyprland
+      activitywatch-awatcher =
+        awService "ActivityWatch window and afk watcher" "${pkgs.awatcher}/bin/awatcher" afterServer;
+      activitywatch-sync = {
+        description = "ActivityWatch sync";
+        unitConfig.ConditionUser = "private";
+        inherit (afterServer) after requires;
+        environment.AW_SYNC_DIR = awSyncDir;
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${awSync}/bin/aw-sync-all";
+        };
+      };
+    };
+    timers.activitywatch-sync = {
+      description = "Periodic ActivityWatch sync";
+      unitConfig.ConditionUser = "private";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "2min";
+        OnUnitActiveSec = "5min";
+      };
+    };
   };
 
   # Configure console keymap
@@ -299,7 +343,6 @@ in {
     systemPackages = with pkgs; [
       sops
       displaylink
-      firefox
       thunderbird
       keepassxc
       ffmpeg
@@ -400,6 +443,14 @@ in {
 
   programs = {
     direnv.enable = true;
+    firefox = {
+      enable = true;
+      policies.ExtensionSettings."{ef87d84c-2127-493f-b952-5b4e744245bc}" = {
+        # aw-watcher-web for activitywatch
+        installation_mode = "force_installed";
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/aw-watcher-web/latest.xpi";
+      };
+    };
     neovim = {
       enable = true;
       defaultEditor = true;
